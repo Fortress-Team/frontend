@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
 
 const LandingPage = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+
     // Animation variants
     const fadeInUp = {
         hidden: { opacity: 0, y: 60 },
@@ -37,8 +41,8 @@ const LandingPage = () => {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="fixed w-full z-50 bg-white/90 backdrop-blur-sm border-b border-neutral-200"
             >
-                <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-                    <Link to="/" className="text-2xl font-bold tracking-tighter flex items-center gap-2 text-blue-600">
+                <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex items-center justify-between">
+                    <Link to="/" className="text-2xl font-bold tracking-tighter flex items-center gap-2 text-blue-600 z-50 relative">
                         <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -46,7 +50,9 @@ const LandingPage = () => {
                         ></motion.div>
                         SPOTLIGHT
                     </Link>
-                    <div className="flex gap-6 items-center">
+
+                    {/* Desktop Menu */}
+                    <div className="hidden md:flex gap-6 items-center">
                         <Link to="/login" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
                             Log In
                         </Link>
@@ -54,13 +60,62 @@ const LandingPage = () => {
                             Get Started
                         </Link>
                     </div>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="md:hidden z-50 p-2 text-neutral-900"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+
                 </div>
             </motion.nav>
 
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, x: '100%' }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: '100%' }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed inset-0 bg-white z-[100] flex flex-col md:hidden"
+                    >
+                        <div className="flex items-center justify-between px-6 py-6 border-b border-neutral-100">
+                            <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-2xl font-bold tracking-tighter flex items-center gap-2 text-blue-600">
+                                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                SPOTLIGHT
+                            </Link>
+                            <button onClick={() => setIsMenuOpen(false)} className="p-2 text-neutral-900">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-8 p-12 text-2xl font-bold">
+                            <Link
+                                to="/login"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="text-neutral-900 hover:text-blue-600 transition-colors"
+                            >
+                                Log In
+                            </Link>
+                            <Link
+                                to="/signup"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="text-neutral-900 hover:text-blue-600 transition-colors"
+                            >
+                                Get Started
+                            </Link>
+                          
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Hero */}
-            <main className="pt-32 px-6">
+            <main className="pt-24 md:pt-32 px-6">
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[70vh]">
+                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[70vh]">
                         <motion.div
                             initial="hidden"
                             animate="visible"
@@ -76,7 +131,7 @@ const LandingPage = () => {
                             <motion.h1
                                 variants={fadeInUp}
                                 transition={{ duration: 0.6, delay: 0.2 }}
-                                className="text-6xl md:text-8xl font-bold leading-none mb-8 text-neutral-900"
+                                className="text-4xl sm:text-5xl md:text-8xl font-bold leading-tight md:leading-none mb-6 md:mb-8 text-neutral-900"
                             >
                                 Your work<br />
                                 <span className="text-blue-600">deserves</span><br />
@@ -85,19 +140,19 @@ const LandingPage = () => {
                             <motion.p
                                 variants={fadeInUp}
                                 transition={{ duration: 0.6, delay: 0.4 }}
-                                className="text-xl text-neutral-600 mb-10 max-w-lg leading-relaxed"
+                                className="text-lg md:text-xl text-neutral-600 mb-8 md:mb-10 max-w-lg leading-relaxed"
                             >
                                 Whether you're a designer, developer, writer, or visionary. Spotlight is the stage to showcase your work and connect with opportunities.
                             </motion.p>
                             <motion.div
                                 variants={fadeInUp}
                                 transition={{ duration: 0.6, delay: 0.6 }}
-                                className="flex gap-4"
+                                className="flex flex-col sm:flex-row gap-4"
                             >
-                                <Link to="/signup" className="px-8 py-4 bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors rounded-lg shadow-lg shadow-blue-600/30">
+                                <Link to="/signup" className="px-6 py-3.5 md:px-8 md:py-4 bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors rounded-lg shadow-lg shadow-blue-600/30 text-center">
                                     Create Profile
                                 </Link>
-                                <Link to="/profile" className="px-8 py-4 border-2 border-neutral-200 text-neutral-900 font-medium hover:border-neutral-300 transition-colors rounded-lg">
+                                <Link to="/profile" className="px-6 py-3.5 md:px-8 md:py-4 border-2 border-neutral-200 text-neutral-900 font-medium hover:border-neutral-300 transition-colors rounded-lg text-center">
                                     View Example
                                 </Link>
                             </motion.div>
@@ -109,15 +164,15 @@ const LandingPage = () => {
                             className="relative hidden lg:block"
                         >
                             <div className="aspect-square bg-neutral-50 border-2 border-neutral-200 relative overflow-hidden rounded-2xl shadow-xl">
-                             
+
                                 <div className="p-8 border-b border-neutral-200">
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl text-white">
                                             👤
                                         </div>
                                         <div>
-                                            <div className="font-bold text-lg text-neutral-900">Alex Morgan</div>
-                                            <div className="text-sm text-neutral-600">Senior Frontend Developer</div>
+                                            <div className="font-bold text-lg text-neutral-900">Adewale Ramadan</div>
+                                            <div className="text-sm text-neutral-600">Junior Frontend Developer</div>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
@@ -126,7 +181,7 @@ const LandingPage = () => {
                                         <span className="px-2 py-1 bg-blue-50 text-xs text-blue-700 border border-blue-200 rounded">Node.js</span>
                                     </div>
                                 </div>
-   
+
                                 <div className="p-8 space-y-4">
                                     <div className="text-sm font-medium text-neutral-600 mb-4">Featured Projects</div>
                                     <div className="bg-white p-4 border-2 border-neutral-200 rounded-lg">
@@ -150,8 +205,8 @@ const LandingPage = () => {
                     </div>
                 </div>
 
-         
-                <div className="max-w-7xl mx-auto mt-40 mb-32">
+
+                <div className="max-w-7xl mx-auto mt-20 md:mt-40 mb-32">
                     <div className="space-y-24">
                         {/* Feature 1  */}
                         <motion.div
@@ -159,7 +214,7 @@ const LandingPage = () => {
                             whileInView="visible"
                             viewport={{ once: true, margin: "-100px" }}
                             variants={staggerContainer}
-                            className="grid lg:grid-cols-2 gap-16"
+                            className="grid lg:grid-cols-2 gap-12 lg:gap-16"
                         >
                             <motion.div
                                 variants={fadeInUp}
@@ -167,8 +222,8 @@ const LandingPage = () => {
                                 className="flex flex-col justify-center"
                             >
                                 <div className="text-blue-600 text-sm font-medium mb-4 uppercase tracking-wider">Portfolio</div>
-                                <h3 className="text-5xl font-bold mb-6 leading-tight text-neutral-900">Showcase your best work</h3>
-                                <p className="text-lg text-neutral-600 leading-relaxed mb-8">
+                                <h3 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight text-neutral-900">Showcase your best work</h3>
+                                <p className="text-base md:text-lg text-neutral-600 leading-relaxed mb-6 md:mb-8">
                                     Create a stunning portfolio with your projects, case studies, and achievements. Add images, links, and detailed descriptions that tell your story.
                                 </p>
                                 <div className="space-y-3 text-sm">
@@ -189,51 +244,51 @@ const LandingPage = () => {
                             <motion.div
                                 variants={scaleIn}
                                 transition={{ duration: 0.6, delay: 0.2 }}
-                                className="bg-neutral-50 border-2 border-neutral-200 p-8 rounded-2xl shadow-lg"
+                                className="bg-neutral-50 border-2 border-neutral-200 p-6 md:p-8 rounded-2xl shadow-lg"
                             >
                                 <div className="space-y-4">
-                                
+
                                     <motion.div
                                         whileHover={{ scale: 1.02 }}
-                                        className="bg-white border-2 border-neutral-200 p-6 h-48 flex flex-col justify-between relative overflow-hidden group rounded-xl hover:border-blue-300 transition-colors cursor-pointer"
+                                        className="bg-white border-2 border-neutral-200 p-4 md:p-6 h-auto md:h-48 flex flex-col justify-between relative overflow-hidden group rounded-xl hover:border-blue-300 transition-colors cursor-pointer"
                                     >
                                         <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                        <div className="relative z-10">
-                                            <div className="text-xs text-neutral-500 mb-2">FEATURED PROJECT</div>
-                                            <div className="text-2xl font-bold mb-2 text-neutral-900">E-Commerce Platform</div>
-                                            <div className="text-sm text-neutral-600">Full-stack marketplace with real-time inventory</div>
+                                        <div className="relative z-10 mb-4">
+                                            <div className="text-[10px] md:text-xs text-neutral-500 mb-2 font-bold uppercase tracking-wider">Featured Project</div>
+                                            <div className="text-2xl md:text-2xl font-bold mb-2 text-neutral-900">E-Commerce Platform</div>
+                                            <div className="text-sm md:text-base text-neutral-600">Full-stack marketplace with real-time inventory</div>
                                         </div>
-                                        <div className="relative z-10 flex items-center justify-between">
-                                            <div className="text-xs text-neutral-500">React • Node.js • PostgreSQL</div>
-                                            <div className="flex items-center gap-2 text-sm">
-                                                <span>⭐ 234</span>
+                                        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-auto">
+                                            <div className="text-xs md:text-xs text-neutral-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis">React • Node.js • PostgreSQL</div>
+                                            <div className="flex items-center gap-3 text-sm text-neutral-600">
+                                                <span className="flex items-center gap-1">⭐ 234</span>
                                                 <span className="text-neutral-400">•</span>
-                                                <span>🔱 45</span>
+                                                <span className="flex items-center gap-1">🔱 45</span>
                                             </div>
                                         </div>
                                     </motion.div>
 
-                             
-                                    <div className="grid grid-cols-2 gap-4">
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <motion.div
                                             whileHover={{ scale: 1.05 }}
-                                            className="bg-white border-2 border-neutral-200 p-4 h-32 flex flex-col justify-between hover:border-blue-300 transition-colors rounded-xl cursor-pointer"
+                                            className="bg-white border-2 border-neutral-200 p-5 h-auto md:h-32 flex flex-col justify-between hover:border-blue-300 transition-colors rounded-xl cursor-pointer"
                                         >
-                                            <div>
-                                                <div className="text-xs text-neutral-500 mb-1">PROJECT</div>
-                                                <div className="font-medium text-sm text-neutral-900">Dashboard UI</div>
+                                            <div className="mb-4">
+                                                <div className="text-[10px] md:text-xs text-neutral-500 mb-1 font-bold uppercase tracking-wider">Project</div>
+                                                <div className="font-bold text-base md:text-sm text-neutral-900">Dashboard UI</div>
                                             </div>
-                                            <div className="text-xs text-neutral-500">⭐ 142</div>
+                                            <div className="text-sm md:text-xs text-neutral-500 font-medium">⭐ 142</div>
                                         </motion.div>
                                         <motion.div
                                             whileHover={{ scale: 1.05 }}
-                                            className="bg-white border-2 border-neutral-200 p-4 h-32 flex flex-col justify-between hover:border-blue-300 transition-colors rounded-xl cursor-pointer"
+                                            className="bg-white border-2 border-neutral-200 p-5 h-auto md:h-32 flex flex-col justify-between hover:border-blue-300 transition-colors rounded-xl cursor-pointer"
                                         >
-                                            <div>
-                                                <div className="text-xs text-neutral-500 mb-1">PROJECT</div>
-                                                <div className="font-medium text-sm text-neutral-900">Mobile App</div>
+                                            <div className="mb-4">
+                                                <div className="text-[10px] md:text-xs text-neutral-500 mb-1 font-bold uppercase tracking-wider">Project</div>
+                                                <div className="font-bold text-base md:text-sm text-neutral-900">Mobile App</div>
                                             </div>
-                                            <div className="text-xs text-neutral-500">⭐ 89</div>
+                                            <div className="text-sm md:text-xs text-neutral-500 font-medium">⭐ 89</div>
                                         </motion.div>
                                     </div>
                                 </div>
@@ -254,7 +309,7 @@ const LandingPage = () => {
                                 className="lg:col-span-3 bg-neutral-50 border-2 border-neutral-200 relative overflow-hidden order-2 lg:order-1 rounded-2xl shadow-lg"
                             >
                                 <div className="p-12">
-                               
+
                                     <div className="mb-8 pb-8 border-b border-neutral-200">
                                         <div className="text-sm text-blue-600 font-medium mb-2 uppercase tracking-wider">Your Reach</div>
                                         <div className="flex items-end gap-4">
@@ -271,7 +326,7 @@ const LandingPage = () => {
                                         </div>
                                     </div>
 
-                                 
+
                                     <motion.div
                                         variants={staggerContainer}
                                         className="grid grid-cols-2 gap-6"
@@ -300,9 +355,9 @@ const LandingPage = () => {
                                 transition={{ duration: 0.6, delay: 0.2 }}
                                 className="lg:col-span-2 order-1 lg:order-2"
                             >
-                                <div className="text-blue-600 text-sm font-medium mb-4 uppercase tracking-wider">Career</div>
-                                <h3 className="text-4xl font-bold mb-6 text-neutral-900">Get discovered</h3>
-                                <p className="text-lg text-neutral-600 leading-relaxed">
+                                <div className="text-blue-600 text-sm font-medium mb-3 md:mb-4 uppercase tracking-wider">Career</div>
+                                <h3 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-neutral-900">Get discovered</h3>
+                                <p className="text-base md:text-lg text-neutral-600 leading-relaxed">
                                     Make your profile visible to recruiters and clients. Share your unique URL and let opportunities find you.
                                 </p>
                             </motion.div>
@@ -319,8 +374,8 @@ const LandingPage = () => {
                         >
                             <div className="max-w-3xl">
                                 <div className="text-blue-600 text-sm font-medium mb-4 uppercase tracking-wider">Simple Setup</div>
-                                <h3 className="text-4xl font-bold mb-6 text-neutral-900">Start in minutes</h3>
-                                <p className="text-lg text-neutral-600 leading-relaxed mb-8">
+                                <h3 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-neutral-900">Start in minutes</h3>
+                                <p className="text-base md:text-lg text-neutral-600 leading-relaxed mb-6 md:mb-8">
                                     No complex setup. Just sign up, add your information, and you're live. Update anytime, anywhere.
                                 </p>
                                 <motion.div
@@ -356,7 +411,7 @@ const LandingPage = () => {
                     <motion.h2
                         variants={fadeInUp}
                         transition={{ duration: 0.6 }}
-                        className="text-5xl md:text-6xl font-bold mb-16 text-neutral-900"
+                        className="text-3xl md:text-6xl font-bold mb-10 md:mb-16 text-neutral-900"
                     >
                         What people say
                     </motion.h2>
@@ -373,7 +428,7 @@ const LandingPage = () => {
                                 "Landed my dream job thanks to my Spotlight profile. Clean, professional, effective."
                             </p>
                             <div className="text-sm">
-                                <div className="font-medium text-neutral-900">Sarah Chen</div>
+                                <div className="font-medium text-neutral-900">Flourence</div>
                                 <div className="text-neutral-500">UX Designer</div>
                             </div>
                         </motion.div>
@@ -386,7 +441,7 @@ const LandingPage = () => {
                                 "Best platform for showcasing dev work. Simple, fast, and it just works."
                             </p>
                             <div className="text-sm">
-                                <div className="font-medium text-neutral-900">Marcus Rodriguez</div>
+                                <div className="font-medium text-neutral-900">Teitei Wisdom</div>
                                 <div className="text-neutral-500">Full-Stack Developer</div>
                             </div>
                         </motion.div>
@@ -399,14 +454,14 @@ const LandingPage = () => {
                                 "My profile looks incredible. Got multiple client inquiries in the first week."
                             </p>
                             <div className="text-sm">
-                                <div className="font-medium text-neutral-900">Emily Watson</div>
+                                <div className="font-medium text-neutral-900">Big Anny</div>
                                 <div className="text-neutral-500">Content Writer</div>
                             </div>
                         </motion.div>
                     </motion.div>
                 </motion.div>
 
-               
+
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
@@ -415,14 +470,14 @@ const LandingPage = () => {
                     transition={{ duration: 0.6 }}
                     className="max-w-7xl mx-auto mb-32"
                 >
-                    <div className="bg-blue-600 p-16 lg:p-24 rounded-2xl shadow-2xl">
+                    <div className="bg-blue-600 p-8 md:p-16 lg:p-24 rounded-2xl shadow-2xl">
                         <div className="max-w-3xl">
-                            <h2 className="text-5xl md:text-6xl font-bold mb-6 text-white">Ready to get started?</h2>
-                            <p className="text-xl text-blue-100 mb-10">
+                            <h2 className="text-3xl md:text-6xl font-bold mb-4 md:mb-6 text-white text-center md:text-left">Ready to get started?</h2>
+                            <p className="text-lg md:text-xl text-blue-100 mb-8 md:mb-10 text-center md:text-left">
                                 Join professionals who are already using Spotlight to grow their careers.
                             </p>
-                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                <Link to="/signup" className="inline-block px-10 py-4 bg-white text-blue-600 font-medium hover:bg-neutral-100 transition-colors rounded-lg shadow-lg">
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex justify-center md:justify-start">
+                                <Link to="/signup" className="inline-block px-8 py-3.5 md:px-10 md:py-4 bg-white text-blue-600 font-medium hover:bg-neutral-100 transition-colors rounded-lg shadow-lg">
                                     Create Your Profile
                                 </Link>
                             </motion.div>
