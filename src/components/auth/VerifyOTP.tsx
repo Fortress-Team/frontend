@@ -1,93 +1,161 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../../store/authStore'
+import { ResendOTP } from '../../lib/api'
+import { RotateCcw, Timer } from 'lucide-react'
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "../ui/input-otp"
 
 const VerifyOTP = () => {
     const navigate = useNavigate()
-    const [otp, setOtp] = useState(['', '', '', '', '', ''])
+    const verifyOTP = useAuthStore((state) => state.verifyOTP)
+    const user = useAuthStore((state) => state.user)
+    const [otp, setOtp] = useState("")
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [resendTimer, setResendTimer] = useState(300)
+    const [canResend, setCanResend] = useState(false)
 
-    const handleChange = (index: number, value: string) => {
-        if (value.length <= 1 && /^\d*$/.test(value)) {
-            const newOtp = [...otp]
-            newOtp[index] = value
-            setOtp(newOtp)
-
-            // Auto-focus next input
-            if (value && index < 5) {
-                const nextInput = document.getElementById(`otp-${index + 1}`)
-                nextInput?.focus()
-            }
+    useEffect(() => {
+        if (resendTimer > 0) {
+            const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
+            return () => clearTimeout(timer)
+        } else {
+            setCanResend(true)
         }
+    }, [resendTimer])
+
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
 
-    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            const prevInput = document.getElementById(`otp-${index - 1}`)
-            prevInput?.focus()
-        }
-    }
-
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const otpCode = otp.join('')
-        console.log('OTP verification:', otpCode)
-        // TODO: Implement actual OTP verification logic
-        navigate('/profile/edit')
+
+        if (otp.length !== 6) {
+            setError('Please enter all 6 digits')
+            return
+        }
+
+        setError('')
+        setLoading(true)
+        try {
+            await verifyOTP(otp)
+            navigate('/profile/edit')
+        } catch (error: any) {
+            setError(error.message || "OTP verification failed. Please try again.")
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const handleResend = () => {
-        console.log('Resending OTP...')
-        // TODO: Implement resend OTP logic
+    const handleResend = async () => {
+        if (!canResend) return
+
+        setError('')
+        try {
+            // Get email from user state or localStorage
+            const email = user?.email || localStorage.getItem('pendingEmail')
+            if (!email) {
+                setError('Email not found. Please sign up again.')
+                return
+            }
+
+            await ResendOTP(email)
+            setResendTimer(300)
+            setCanResend(false)
+            setOtp("")
+        } catch (error: any) {
+            setError(error.message || 'Failed to resend code. Please try again.')
+        }
     }
 
     return (
-        <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-6 text-white font-sans selection:bg-blue-500/30">
-            <div className="max-w-md w-full bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl">
-                <div className="text-center mb-8">
-                    <Link to="/" className="text-2xl font-bold tracking-tighter flex items-center justify-center gap-2 mb-6">
-                        <div className="w-3 h-3 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.5)]"></div>
-                        SPOTLIGHT
-                    </Link>
-                    <h1 className="text-2xl font-bold text-white mb-2">
-                        Verify Your Email
-                    </h1>
-                    <p className="text-neutral-400">We sent a code to your email address</p>
-                </div>
+        <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
+            <div className="max-w-xl w-full">
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-neutral-400 mb-4 text-center">
-                            Enter 6-digit code
-                        </label>
-                        <div className="flex gap-2 justify-center">
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    id={`otp-${index}`}
-                                    type="text"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleChange(index, e.target.value)}
-                                    onKeyDown={(e) => handleKeyDown(index, e)}
-                                    className="w-12 h-14 text-center text-2xl font-bold rounded-xl bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
-                                    required
-                                />
-                            ))}
-                        </div>
+                <Link to="/" className="inline-block mb-12">
+                    <div className="text-3xl font-bold text-blue-600 flex items-center gap-2">
+                        <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                        SpotLight
+                    </div>
+                </Link>
+
+
+                <div className="bg-white border-2 border-neutral-200 rounded-3xl p-6 md:p-12 shadow-sm">
+
+                    <div className="text-center mb-8 md:mb-10">
+                        <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-3">
+                            Verify your email
+                        </h1>
+                        <p className="text-neutral-600">
+                            Enter the six digit code sent to your mail
+                        </p>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transform hover:scale-[1.02]"
-                    >
-                        Verify Email
-                    </button>
-                </form>
+                    <form onSubmit={handleSubmit} className="space-y-8 flex flex-col items-center">
 
-                <div className="mt-8 text-center text-sm text-neutral-500">
-                    Didn't receive the code?{' '}
-                    <button onClick={handleResend} className="text-blue-400 font-semibold hover:text-blue-300 transition-colors">
-                        Resend
-                    </button>
+                        <InputOTP
+                            maxLength={6}
+                            value={otp}
+                            onChange={(value) => setOtp(value)}
+                        >
+                            <InputOTPGroup>
+                                <InputOTPSlot index={0} />
+                                <InputOTPSlot index={1} />
+                                <InputOTPSlot index={2} />
+                                <InputOTPSlot index={3} />
+                                <InputOTPSlot index={4} />
+                                <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                        </InputOTP>
+
+                        {error && (
+                            <div className="w-full p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading || otp.length !== 6}
+                            className="w-full py-3 md:py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                        >
+                            {loading ? 'Verifying...' : 'Verify Email'}
+                        </button>
+
+
+                        <div className="text-center">
+                            {canResend ? (
+                                <button
+                                    type="button"
+                                    onClick={handleResend}
+                                    className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors inline-flex items-center gap-2"
+                                >
+                                    <RotateCcw className="w-4 h-4" />
+                                    Resend Code
+                                </button>
+                            ) : (
+                                <p className="text-sm text-neutral-500 inline-flex items-center gap-2">
+                                    <Timer className="w-4 h-4 text-blue-600" />
+                                    Resend Code in <span className="text-blue-600 font-semibold">{formatTime(resendTimer)}</span>
+                                </p>
+                            )}
+                        </div>
+                    </form>
+                </div>
+
+
+                <div className="mt-8 text-center text-sm text-neutral-600">
+                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                        ← Back to Sign In
+                    </Link>
                 </div>
             </div>
         </div>
