@@ -40,7 +40,10 @@ const UserProfile = () => {
                         <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
                         SpotLight
                     </Link>
-                    <div className="flex gap-4 items-center">
+                    <div className="flex gap-6 items-center">
+                        <Link to="/explore" className="text-sm font-medium text-neutral-500 hover:text-blue-600 transition-colors">
+                            Explore
+                        </Link>
                         <button
                             onClick={handleLogout}
                             className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"

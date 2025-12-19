@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+
 import { lazy, Suspense } from 'react'
 import Loader from './components/reuseable/loader'
 
@@ -11,13 +12,15 @@ const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword'))
 const ResetPassword = lazy(() => import('./components/auth/ResetPassword'))
 const UserProfile = lazy(() => import('./components/profile/UserProfile'))
 const EditProfile = lazy(() => import('./components/profile/EditProfile'))
+const ExploreTalents = lazy(() => import('./components/explore/ExploreTalents'))
 
 function App() {
   return (
-    <Suspense fallback={<Loader  />}>
- 
+    <Suspense fallback={<Loader />}>
+
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/explore" element={<ExploreTalents />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
@@ -28,6 +31,7 @@ function App() {
       </Routes>
 
     </Suspense>
+
   )
 }
 
