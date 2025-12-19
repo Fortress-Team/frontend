@@ -1,25 +1,33 @@
 import { Routes, Route } from 'react-router-dom'
-import LandingPage from './components/LandingPage'
-import Login from './components/auth/Login'
-import SignUp from './components/auth/SignUp'
-import VerifyOTP from './components/auth/VerifyOTP'
-import ForgotPassword from './components/auth/ForgotPassword'
-import ResetPassword from './components/auth/ResetPassword'
-import UserProfile from './components/profile/UserProfile'
-import EditProfile from './components/profile/EditProfile'
+import { lazy, Suspense } from 'react'
+import Loader from './components/reuseable/loader'
+
+
+const LandingPage = lazy(() => import('./components/LandingPage'))
+const Login = lazy(() => import('./components/auth/Login'))
+const SignUp = lazy(() => import('./components/auth/SignUp'))
+const VerifyOTP = lazy(() => import('./components/auth/VerifyOTP'))
+const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword'))
+const ResetPassword = lazy(() => import('./components/auth/ResetPassword'))
+const UserProfile = lazy(() => import('./components/profile/UserProfile'))
+const EditProfile = lazy(() => import('./components/profile/EditProfile'))
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/verify-otp" element={<VerifyOTP />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/profile" element={<UserProfile />} />
-      <Route path="/profile/edit" element={<EditProfile />} />
-    </Routes>
+    <Suspense fallback={<Loader  />}>
+ 
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
+      </Routes>
+
+    </Suspense>
   )
 }
 

@@ -29,16 +29,16 @@ export const  useAuthStore = create<AuthState>()(
                 try {
                     const response = await LoginUser({email , password});
                     set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
-                } catch (error : any) {
-                    throw new Error(error.message || "Login failed");
+                } catch (error : unknown) {
+                    throw new Error(error instanceof Error ? error.message : "Login failed");
                 }
             },
             register : async (fullName : string , email : string , password : string) => {
                 try {
                     const response = await RegisterUser({fullName , email , password});
                     set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
-                } catch (error : any) {
-                    throw new Error(error.message || "Registration failed");
+                } catch (error : unknown) {
+                    throw new Error( error instanceof Error ? error.message : "Registration failed");
                 }
             },
             logout : () => {
@@ -48,8 +48,8 @@ export const  useAuthStore = create<AuthState>()(
                 try {
                     const response = await VerifyOTP(otp);
                     set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
-                } catch (error : any) {
-                    throw new Error(error.message || "OTP verification failed");
+                } catch (error : unknown) {
+                    throw new Error(error instanceof Error ? error.message : "OTP verification failed");
                 }
             }
         }),
