@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
+import { Eye, EyeOff } from 'lucide-react'
 
 
 const SignUp = () => {
@@ -9,6 +10,7 @@ const SignUp = () => {
     const register = useAuthStore((state) => state.register)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [showPass, setShowPass] = useState(false)
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -31,9 +33,9 @@ const SignUp = () => {
         try {
             await register(formData.fullName, formData.email, formData.password)
             navigate('/verify-otp')
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Registration Error Details:", error);
-            setError(error.message || "Registration failed. Please try again.")
+            setError(error instanceof Error? error.message : "Registration failed. Please try again.")
         } finally {
             setLoading(false)
         }
@@ -123,21 +125,44 @@ const SignUp = () => {
                         />
                     </div>
 
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 md:py-3.5 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
-                            placeholder="Create a strong password"
-                            required
-                        />
-                    </div>
+                    {/* Password */}
+
+                                <div>
+  <div className="flex items-center justify-between mb-2">
+    <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
+      Password
+    </label>
+    <Link
+      to="/forgot-password"
+      className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors hidden"
+    >
+      Forgot password?
+    </Link>
+  </div>
+
+  {/* Input wrapper */}
+  <div className="relative">
+    <input
+      type={showPass ? "text" : "password"}
+      id="password"
+      value={formData.password}
+            onChange={handleChange}
+      className="w-full px-4 py-3.5 pr-12 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
+      placeholder="Enter your password"
+      required
+    />
+
+    {/* Eye toggle */}
+    <button
+      type="button"
+      onClick={() => setShowPass(!showPass)}
+      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
+    >
+      {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
+
 
 
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
+import { Eye, EyeOff } from 'lucide-react'
 
 
 const Login = () => {
@@ -11,6 +12,7 @@ const Login = () => {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [showPass, setShowPass]=  useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -76,6 +78,7 @@ const Login = () => {
 
               
                 <form onSubmit={handleSubmit} className="space-y-5">
+
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
                             Email Address
@@ -91,25 +94,44 @@ const Login = () => {
                         />
                     </div>
 
+              
+
                     <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
-                                Password
-                            </label>
-                            <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-                                Forgot password?
-                            </Link>
-                        </div>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3.5 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
-                            placeholder="Enter your password"
-                            required
-                        />
-                    </div>
+  <div className="flex items-center justify-between mb-2">
+    <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
+      Password
+    </label>
+    <Link
+      to="/forgot-password"
+      className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+    >
+      Forgot password?
+    </Link>
+  </div>
+
+  {/* Input wrapper */}
+  <div className="relative">
+    <input
+      type={showPass ? "text" : "password"}
+      id="password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="w-full px-4 py-3.5 pr-12 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
+      placeholder="Enter your password"
+      required
+    />
+
+    {/* Eye toggle */}
+    <button
+      type="button"
+      onClick={() => setShowPass(!showPass)}
+      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
+    >
+      {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
+
 
                     {error && (
                         <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
