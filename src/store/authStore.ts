@@ -9,7 +9,6 @@ interface User {
 }
 
 interface AuthState {
-    token : string | null ;
     user : User | null;
     isAuthenticated : boolean ;
     login : (email : string , password : string) =>Promise<void>;
@@ -22,32 +21,45 @@ interface AuthState {
 export const  useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
-            token : null,
             user : null,
             isAuthenticated : false,
             login : async (email : string , password : string) => {
                 try {
                     const response = await LoginUser({email , password});
-                    set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
+                    console.log("[AuthStore] Login Success:", response);
+                    const userData = response.user ? {
+                        ...response.user,
+                        id: response.user.id || (response.user as any)._id
+                    } : null;
+                    set({user : userData , isAuthenticated : true});
                 } catch (error : unknown) {
+                    console.error("[AuthStore] Login Error:", error);
                     throw new Error(error instanceof Error ? error.message : "Login failed");
                 }
             },
             register : async (fullName : string , email : string , password : string) => {
                 try {
                     const response = await RegisterUser({fullName , email , password});
-                    set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
+                    const userData = response.user ? {
+                        ...response.user,
+                        id: response.user.id || (response.user as any)._id
+                    } : null;
+                    set({ user : userData , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error( error instanceof Error ? error.message : "Registration failed");
                 }
             },
             logout : () => {
-                set({token : null , user : null , isAuthenticated : false});
+                set({ user : null , isAuthenticated : false});
             },
             verifyOTP : async (otp : string) => {
                 try {
                     const response = await VerifyOTP(otp);
-                    set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
+                    const userData = response.user ? {
+                        ...response.user,
+                        id: response.user.id || (response.user as any)._id
+                    } : null;
+                    set({ user : userData , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error(error instanceof Error ? error.message : "OTP verification failed");
                 }
@@ -55,7 +67,6 @@ export const  useAuthStore = create<AuthState>()(
         }),
         {
             name : "auth-storage",
-            
         }
     )
 )
