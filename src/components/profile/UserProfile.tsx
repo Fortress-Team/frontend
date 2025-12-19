@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useEffect, useState, useRef } from 'react'
-import { ChevronDown, User, LogOut, Compass } from 'lucide-react'
+import { ChevronDown, LogOut, Compass } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const UserProfile = () => {
