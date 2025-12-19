@@ -1,11 +1,31 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
+import { useAuthStore } from '../../store/authStore'
 
 const Header = () => {
-
+    const navigate = useNavigate()
+    const { user, isAuthenticated, logout } = useAuthStore()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    const handleLogout = () => {
+        logout()
+        setIsDropdownOpen(false)
+        navigate('/')
+    }
 
     return (
         <section>
@@ -32,12 +52,66 @@ const Header = () => {
                         <Link to="/explore" className="text-sm font-medium text-neutral-600 hover:text-blue-600 transition-colors">
                             Explore
                         </Link>
-                        <Link to="/login" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
-                            Log In
-                        </Link>
-                        <Link to="/signup" className="px-6 py-2 bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors rounded-lg">
-                            Get Started
-                        </Link>
+
+                        {isAuthenticated && user ? (
+                            <div className="relative" ref={dropdownRef}>
+                                <button
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
+                                >
+                                    <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
+                                        {user.fullName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <ChevronDown
+                                        size={18}
+                                        className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                    />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isDropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.15, ease: "easeOut" }}
+                                            className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+                                        >
+                                            <div className="px-4 py-3 border-b border-neutral-100 mb-2">
+                                                <p className="text-sm font-bold text-neutral-900 truncate">{user.fullName}</p>
+                                                <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                                            </div>
+
+                                            <Link
+                                                to="/profile"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                                className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors"
+                                            >
+                                                <User size={18} />
+                                                View Profile
+                                            </Link>
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+                                            >
+                                                <LogOut size={18} />
+                                                Logout
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <>
+                                <Link to="/login" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
+                                    Log In
+                                </Link>
+                                <Link to="/signup" className="px-6 py-2 bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors rounded-lg">
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -78,21 +152,44 @@ const Header = () => {
                             >
                                 Explore
                             </Link>
-                            <Link
-                                to="/login"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="text-neutral-900 hover:text-blue-600 transition-colors"
-                            >
-                                Log In
-                            </Link>
-                            <Link
-                                to="/signup"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="text-neutral-900 hover:text-blue-600 transition-colors"
-                            >
-                                Get Started
-                            </Link>
 
+                            {isAuthenticated && user ? (
+                                <>
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="text-neutral-900 hover:text-blue-600 transition-colors"
+                                    >
+                                        My Profile
+                                    </Link>
+                                    <button
+                                        onClick={() => {
+                                            handleLogout()
+                                            setIsMenuOpen(false)
+                                        }}
+                                        className="text-left text-red-600 hover:text-red-700 transition-colors"
+                                    >
+                                        Logout
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        to="/login"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="text-neutral-900 hover:text-blue-600 transition-colors"
+                                    >
+                                        Log In
+                                    </Link>
+                                    <Link
+                                        to="/signup"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="text-neutral-900 hover:text-blue-600 transition-colors"
+                                    >
+                                        Get Started
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </motion.div>
                 )}

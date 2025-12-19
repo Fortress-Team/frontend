@@ -1,16 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { ChevronDown, User, LogOut, Compass } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const UserProfile = () => {
     const navigate = useNavigate()
     const { user, isAuthenticated, logout } = useAuthStore()
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!isAuthenticated) {
             navigate('/login')
         }
     }, [isAuthenticated, navigate])
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     const handleLogout = () => {
         logout()
@@ -40,18 +54,61 @@ const UserProfile = () => {
                         <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
                         SpotLight
                     </Link>
-                    <div className="flex gap-6 items-center">
-                        <Link to="/explore" className="text-sm font-medium text-neutral-500 hover:text-blue-600 transition-colors">
+
+                    <div className="flex items-center gap-8">
+                        <Link to="/explore" className="hidden md:block text-sm font-medium text-neutral-500 hover:text-blue-600 transition-colors">
                             Explore
                         </Link>
-                        <button
-                            onClick={handleLogout}
-                            className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
-                        >
-                            Logout
-                        </button>
-                        <div className="h-10 w-10 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white">
-                            {user.fullName.charAt(0).toUpperCase()}
+
+                        {/* Profile Dropdown */}
+                        <div className="relative" ref={dropdownRef}>
+                            <button
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
+                            >
+                                <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
+                                    {user.fullName.charAt(0).toUpperCase()}
+                                </div>
+                                <ChevronDown
+                                    size={18}
+                                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                />
+                            </button>
+
+                            <AnimatePresence>
+                                {isDropdownOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.15, ease: "easeOut" }}
+                                        className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+                                    >
+                                        <div className="px-4 py-3 border-b border-neutral-100 mb-2">
+                                            <p className="text-sm font-bold text-neutral-900 truncate">{user.fullName}</p>
+                                            <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                                        </div>
+
+
+                                        <Link
+                                            to="/explore"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors md:hidden"
+                                        >
+                                            <Compass size={18} />
+                                            Explore
+                                        </Link>
+
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+                                        >
+                                            <LogOut size={18} />
+                                            Logout
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
