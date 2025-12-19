@@ -12,7 +12,7 @@ const Cta = () => {
                     viewport={{ once: true, margin: "-100px" }}
                     variants={scaleIn}
                     transition={{ duration: 0.6 }}
-                    className="max-w-8 mx-auto mb-32"
+                    className="max-w-8xl mx-auto mb-32"
                 >
                     <div className="bg-blue-600 p-6 md:p-16 lg:p-24 rounded-2xl shadow-2xl">
                         <div className="max-w-3xl">
