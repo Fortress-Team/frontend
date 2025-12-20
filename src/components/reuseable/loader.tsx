@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Loader() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
+    <div className="fixed inset-0 flex items-center justify-center bg-white z-9999">
       <Link
         to="/"
         className="text-2xl font-bold tracking-tighter flex items-center gap-2 text-blue-600"

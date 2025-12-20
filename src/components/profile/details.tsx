@@ -5,8 +5,9 @@ import Loader from "../reuseable/loader";
 import { ChevronDown, Compass, LogOut } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Experience, Project } from "../../types";
+import type { Experience, Project, User } from "../../types";
 import type { Skill } from "../../types/skill.type";
+import Footer from "../reuseable/footer";
 
 
 
@@ -30,10 +31,16 @@ const UserProfileDetails = () => {
     );
   }
 
+  console.log('Talent details:', talent)
+
   return (
-    <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20">
+    <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20 gap-20">
       {/* Navbar */}
-      <Navs />
+
+      {/* i want to pass telent into nav */}
+      <Navs talent={talent} />
+
+  
 
       <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT COLUMN */}
@@ -244,6 +251,11 @@ const UserProfileDetails = () => {
 
         </div>
       </div>
+
+<div className="mt-10">
+      <Footer  />
+</div>
+
     </div>
   );
 };
@@ -252,7 +264,167 @@ export default UserProfileDetails;
 
 
 
-const Navs = () => {
+
+
+type NavsProps = {
+  talent: User;
+};
+
+const Navs = ({ talent }: NavsProps) => {
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const {user} = useAuthStore()
+
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    navigate("/");
+  };
+
+  if (!talent) {
+    return (
+      <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* NAVBAR */}
+      <nav className="fixed w-full z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link
+            to="/"
+            className="text-2xl font-bold flex items-center gap-2 text-blue-600"
+          >
+            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+            SpotLight
+          </Link>
+
+          <div className="flex items-center gap-8">
+  <Link
+              to="/explore"
+              className="hidden md:block text-sm font-medium text-neutral-500 hover:text-blue-600 transition-colors"
+            >
+              Home
+            </Link>
+            
+            <Link
+              to="/explore"
+              className="hidden md:block text-sm font-medium text-neutral-500 hover:text-blue-600 transition-colors"
+            >
+              Explore
+            </Link>
+
+            {/* PROFILE DROPDOWN */}
+    { !user ?
+    
+  <Link to="/login" className="px-5 py-2.5 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors">Log In</Link>
+    
+    
+    :<div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
+              >
+                <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
+                  {user?.fullName.charAt(0).toUpperCase()}
+                </div>
+                <ChevronDown
+                  size={18}
+                  className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-neutral-100 mb-2">
+                      <p className="text-sm font-bold text-neutral-900 truncate">
+                        {user?.fullName ?? ''}
+                      </p>
+                      <p className="text-xs text-neutral-500 truncate">
+                        {user?.email ?? ''}
+                      </p>
+                    </div>
+
+                    <Link
+                      to="/explore"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors md:hidden"
+                    >
+                      <Compass size={18} />
+                      Explore
+                    </Link>
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+}
+          </div>
+        </div>
+      </nav>
+
+      {/* PROFILE HEADER */}
+      <div className="pt-20">
+        <div className="h-60 w-full bg-linear-to-br from-blue-50 to-white border-b border-neutral-200 relative overflow-hidden">
+      
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.1),transparent_50%)]"></div>
+       
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 -mt-20 relative z-10">
+          <div className="flex flex-col md:flex-row gap-6 items-center md:items-end">
+
+
+                {talent.avatar ?
+
+              <img src={talent.avatar}
+              className="w-40 h-40 rounded-full" alt=""  />
+
+              :
+            <div className="h-40 w-40 rounded-full bg-white border-4 border-white shadow-xl">
+
+              <div className="h-full w-full rounded-full bg-blue-100 flex items-center justify-center text-5xl overflow-hidden border-2 border-blue-200">
+                <span className="text-blue-600 font-bold">
+                  {talent.fullName.charAt(0).toUpperCase()}
+                </span>
+
+              </div>
+
 
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuthStore()
@@ -404,4 +576,32 @@ const Navs = () => {
 
   )
 
+
+            </div>
 }
+            <div className="mb-4 flex-1 text-center md:text-left">
+              <h1 className="text-4xl font-bold text-neutral-900 mb-1">
+                {talent.fullName}
+              </h1>
+              <p className="text-neutral-700 font-medium text-lg">
+                {talent.profRole || ""}
+              </p>
+              <p className="text-neutral-500 text-sm">
+         {talent.email} • Joined{" "}
+{talent.createdAt
+  ? new Date(talent.createdAt).toLocaleDateString("en", {
+      month: "short",
+      year: "numeric",
+    })
+  : ""}
+
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
