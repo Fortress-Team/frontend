@@ -31,7 +31,7 @@ export const  useAuthStore = create<AuthState>()(
                     const response = await LoginUser({email , password});
                     set({  
                         user : response.user || null , 
-                        token: response.token || null,
+                        token: response.token || "", 
                         isAuthenticated : true
                     });
                 } catch (error : unknown) {
@@ -44,7 +44,7 @@ export const  useAuthStore = create<AuthState>()(
                     const response = await RegisterUser({fullName , email , password});
                     set({ 
                         user : response.user || null , 
-                        token: response.token || null,
+                        token: response.token || "", 
                         isAuthenticated : true
                     });
                 } catch (error : unknown) {
@@ -59,7 +59,7 @@ export const  useAuthStore = create<AuthState>()(
                     const response = await VerifyOTP(otp);
                     set({
                         user : response.user || null , 
-                        token: response.token || null,
+                        token: response.token || "", 
                         isAuthenticated : true
                     });
                 } catch (error : unknown) {

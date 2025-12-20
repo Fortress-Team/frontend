@@ -10,8 +10,8 @@ export type UserRole = "Talent" | "Recruiter"
 
 export interface UserLinks {
   github?: string
-  linkedIn?: string
-  x?: string
+  linkedin?: string
+  X?: string
   portfolio?: string
 }
 

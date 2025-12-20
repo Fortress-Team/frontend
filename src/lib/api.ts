@@ -31,7 +31,6 @@ api.interceptors.request.use(
       // 2. If no token in storage, try to get it from cookies
       if (!token) {
         try {
-            // Try identifying token by common names
             const match = document.cookie.match(new RegExp('(^| )(accessToken|access_token|token)=([^;]+)'));
             if (match) {
                 token = match[3];
@@ -384,21 +383,13 @@ export const getUserLinks = async (): Promise<UserLinks> => {
     }
     return { github: "", linkedin: "", X: "", portfolio: "" };
   } catch (error) {
-    console.error("Failed to fetch links:", error);
-    return { github: "", linkedin: "", X: "", portfolio: "" };
+    throw handleError(error, "Failed to fetch links");
   }
 };
 
 export const upsertUserLinks = async (payload: UserLinks): Promise<UserLinks> => {
   try {
-    // Only send the fields the backend allows
-    const cleanPayload = {
-      github: payload.github || "",
-      linkedin: payload.linkedin || "",
-      X: payload.X || "",
-      portfolio: payload.portfolio || ""
-    };
-    const response = await api.patch("user/links/upsert", cleanPayload);
+    const response = await api.patch("user/links/upsert", payload);
     return response.data.links || response.data.data || response.data;
   } catch (error) {
     throw handleError(error, "Failed to update links");
@@ -407,7 +398,8 @@ export const upsertUserLinks = async (payload: UserLinks): Promise<UserLinks> =>
 
 export const getUserProfile = async (id: string): Promise<UserProfileData> => {
   try {
-    const response = await api.get(`users/${id}`); 
+    const timestamp = new Date().getTime();
+    const response = await api.get(`users/${id}?t=${timestamp}`);
     const data = response.data.user || response.data.data || response.data;
     return Array.isArray(data) ? data[0] : data;
   } catch (error) {
@@ -417,21 +409,7 @@ export const getUserProfile = async (id: string): Promise<UserProfileData> => {
 
 export const updateUserProfile = async (id: string, payload: Partial<UserProfileData>): Promise<UserProfileData> => {
   try {
-    // Ensure we don't send undefined fields
-    const cleanPayload: any = {
-      fullName: payload.fullName,
-      profRole: payload.profRole,
-      bio: payload.bio || "",
-      location: payload.location || "",
-    };
-    
-    // Only send avatar if it's not empty, or send it as "" if that's what's intended
-    // The user said it can be empty, so we send what they provide
-    if (payload.avatar !== undefined) {
-      cleanPayload.avatar = payload.avatar;
-    }
-
-    const response = await api.put(`users/${id}`, cleanPayload);
+    const response = await api.put(`users/${id}`, payload);
     const data = response.data.user || response.data.data || response.data;
     return Array.isArray(data) ? data[0] : data;
   } catch (error) {
