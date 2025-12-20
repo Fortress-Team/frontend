@@ -47,7 +47,7 @@ const UserProfile = () => {
                 setSkills(skillData)
                 setLinks(linksData)
 
-                const userId = user?._id || (user as User)?._id
+                const userId = (user as any)?.id || user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setProfile(profileData)
@@ -214,7 +214,7 @@ const UserProfile = () => {
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">About</h3>
                         <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
-                            {profile?.bio || (isAuthenticated && (user?._id === profile?.id || (user as User)?._id === (profile as any)?._id) ? "No bio added yet. Tell us about yourself!" : "")}
+                            {profile?.bio || (isAuthenticated && ((user as any)?.id === profile?.id || user?._id === profile?.id || (user as any)?.id === (profile as any)?.id) ? "No bio added yet. Tell us about yourself!" : "")}
                         </p>
 
                         <div className="mt-6 flex flex-wrap gap-4 text-neutral-400">

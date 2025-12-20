@@ -92,7 +92,7 @@ const EditProfile = () => {
                 setSkills(skillData)
                 setSocialLinks(linksData)
 
-                const userId = user?._id || (user as User)?._id
+                const userId = (user as any)?.id || user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setBasicInfo({
@@ -272,7 +272,7 @@ const EditProfile = () => {
     const [isSaving, setIsSaving] = useState(false)
 
     const handleSave = async () => {
-        const userId = user?._id || (user as User)?._id
+        const userId = (user as any)?.id || user?._id || (user as User)?._id
         if (!userId) {
             toast.error("User ID not found. Please log in again.")
             return
@@ -290,7 +290,7 @@ const EditProfile = () => {
                 })
             ])
             toast.success('Profile updated successfully!')
-            navigate('/profile')
+            window.location.href = '/profile'
         } catch (error: unknown) {
 
             const errorMessage = error instanceof Error ? error.message : "Internal server error";
@@ -351,7 +351,7 @@ const EditProfile = () => {
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="hidden flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSaving ? 'Saving...' : 'Save Changes'}
                         </button>
@@ -458,6 +458,30 @@ const EditProfile = () => {
                                 />
                             </div>
                         </div>
+
+                        <div className="flex justify-end mt-8 border-t border-neutral-100 pt-6">
+                            <button
+                                onClick={async () => {
+                                    const userId = (user as any)?.id || user?._id || (user as User)?._id;
+                                    if (!userId) { toast.error("Please login"); return; }
+                                    setIsSaving(true);
+                                    try {
+                                        await updateUserProfile(userId, basicInfo);
+                                        toast.success('Basic information updated!');
+                                        window.location.href = '/profile';
+                                    } catch (error: any) {
+                                        toast.error(error.message || 'Failed to update info');
+                                    } finally {
+                                        setIsSaving(false);
+                                    }
+                                }}
+                                disabled={isSaving}
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
+                            >
+                                {isSaving ? <Loader2 className="animate-spin" size={20} /> : null}
+                                Save Basic Info
+                            </button>
+                        </div>
                     </section>
 
                     <section className="p-8 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
@@ -507,6 +531,29 @@ const EditProfile = () => {
                                     placeholder="https://yourwebsite.com"
                                 />
                             </div>
+                        </div>
+
+                        <div className="flex justify-end mt-8 border-t border-neutral-100 pt-6">
+                            <button
+                                onClick={async () => {
+                                    setIsSaving(true);
+                                    try {
+                                        await upsertUserLinks(socialLinks);
+                                        toast.success('Social links updated!');
+                                        // Refresh to show updates
+                                        window.location.href = '/profile';
+                                    } catch (error: any) {
+                                        toast.error(error.message || 'Failed to update links');
+                                    } finally {
+                                        setIsSaving(false);
+                                    }
+                                }}
+                                disabled={isSaving}
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
+                            >
+                                {isSaving ? <Loader2 className="animate-spin" size={20} /> : null}
+                                Update Social Links
+                            </button>
                         </div>
                     </section>
 
@@ -861,8 +908,8 @@ const EditProfile = () => {
                         </div>
                     </section>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
 
