@@ -40,7 +40,7 @@ const UserProfileDetails = () => {
       {/* i want to pass telent into nav */}
       <Navs talent={talent} />
 
-  
+
 
       <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT COLUMN */}
@@ -252,9 +252,9 @@ const UserProfileDetails = () => {
         </div>
       </div>
 
-<div className="mt-10">
-      <Footer  />
-</div>
+      <div className="mt-10">
+        <Footer />
+      </div>
 
     </div>
   );
@@ -275,7 +275,7 @@ type NavsProps = {
 
 const Navs = ({ talent }: NavsProps) => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -355,9 +355,8 @@ const Navs = ({ talent }: NavsProps) => {
                   </div>
                   <ChevronDown
                     size={18}
-                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${
-                      isDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -379,16 +378,16 @@ const Navs = ({ talent }: NavsProps) => {
                         </p>
                       </div>
 
-                           <Link
-                                            to="/profile"
-                                            onClick={() => setIsDropdownOpen(false)}
-                                            className="flex items-center gap-3 px-4 py-2 
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 
                                             text-sm text-neutral-700 hover:bg-neutral-50
                                              hover:text-blue-600 transition-colors "
-                                        >
-                                            <UserIcon size={18} />
-                                            Profile
-                                        </Link>
+                      >
+                        <UserIcon size={18} />
+                        Profile
+                      </Link>
 
                       <Link
                         to="/explore"
@@ -446,9 +445,9 @@ const Navs = ({ talent }: NavsProps) => {
                 {talent.email} • Joined{" "}
                 {talent.createdAt
                   ? new Date(talent.createdAt).toLocaleDateString("en", {
-                      month: "short",
-                      year: "numeric",
-                    })
+                    month: "short",
+                    year: "numeric",
+                  })
                   : ""}
               </p>
             </div>
