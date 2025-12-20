@@ -3,8 +3,7 @@ import { useAuthStore } from "../store/authStore";
 import type { User } from "../types";
 
 const api = axios.create({
-  baseURL: import.meta.env.MODE === "development" ? "/api/v1" : "https://fortress-backend-og7k.onrender.com/api/v1",
-  withCredentials: true,
+  baseURL: import.meta.env.PROD ? "https://fortress-backend-og7k.onrender.com/api/v1" : "/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
