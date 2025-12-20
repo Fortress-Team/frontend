@@ -37,9 +37,8 @@ const SignUp = () => {
             navigate('/verify-otp')
         } catch (error: any) {
             console.error("[SignUp] Registration CRITICAL ERROR:", error);
-            if (error.response) {
-                console.error("[SignUp] Backend Data:", error.response.data);
-                console.error("[SignUp] Status Code:", error.response.status);
+            if (error.data) {
+                console.error("[SignUp] Raw Backend Data:", error.data);
             }
             setError(error.message || "Registration failed. Please try again.")
         } finally {
@@ -174,7 +173,7 @@ const SignUp = () => {
 
 
                     {error && (
-                        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
                             {error}
                         </div>
                     )}

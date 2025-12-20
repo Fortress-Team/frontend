@@ -131,17 +131,22 @@ export interface UserProfileData {
 
 const handleError = (error: any, defaultMsg: string) => {
   const err = error as AxiosError<ApiError>;
+  console.error(`[API Error] ${defaultMsg}:`, {
+    status: err.response?.status,
+    data: err.response?.data,
+    config: err.config?.url
+  });
+  // Return the full specialized object so we don't lose the 'errors' array
   return err.response?.data || { message: defaultMsg };
 };
 
 export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/register", {
-      ...payload,
-      name: payload.fullName, // Support different backend naming
-      role: "Talent",         // Standard role
-      profRole: "Talent",     // Potential schema requirement
-      location: "Global"      // Potential schema requirement
+      name: payload.fullName,    // Standard
+      fullName: payload.fullName, // Legacy/Alias
+      email: payload.email,
+      password: payload.password
     });
     const data = response.data;
     // Robust extraction for potentially nested data
