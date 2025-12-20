@@ -13,6 +13,7 @@ import { Trash2, Plus, Upload, Loader2, Link as LinkIcon } from 'lucide-react'
 import { uploadImage } from '../../lib/cloudinary'
 import { toast } from 'sonner'
 import type { User } from '../../types'
+import Loader from '../reuseable/loader'
 
 const EditProfile = () => {
     const navigate = useNavigate()
