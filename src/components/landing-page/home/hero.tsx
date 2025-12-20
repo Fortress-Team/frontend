@@ -46,8 +46,8 @@ const Hero = () => {
                                 <Link to="/signup" className="px-6 py-3.5 md:px-8 md:py-4 bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors rounded-lg shadow-lg shadow-blue-600/30 text-center">
                                     Create Profile
                                 </Link>
-                                <Link to="/profile" className="px-6 py-3.5 md:px-8 md:py-4 border-2 border-neutral-200 text-neutral-900 font-medium hover:border-neutral-300 transition-colors rounded-lg text-center">
-                                    View Example
+                                <Link to="/explore" className="px-6 py-3.5 md:px-8 md:py-4 border-2 border-neutral-200 text-neutral-900 font-medium hover:border-neutral-300 transition-colors rounded-lg text-center">
+                                    Explore Talents
                                 </Link>
                             </motion.div>
                         </motion.div>

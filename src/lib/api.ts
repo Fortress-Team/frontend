@@ -136,7 +136,10 @@ const handleError = (error: any, defaultMsg: string) => {
 
 export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse> => {
   try {
-    const response = await api.post("auth/register", payload);
+    const response = await api.post("auth/register", {
+      ...payload,
+      name: payload.fullName // Send both for backend compatibility
+    });
     const data = response.data;
     // Robust extraction for potentially nested data
     const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;

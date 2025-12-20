@@ -31,11 +31,17 @@ const SignUp = () => {
         setError('')
         setLoading(true)
         try {
+            console.log("[SignUp] Attempting registration with:", { ...formData, password: '***' })
             await register(formData.fullName, formData.email, formData.password)
+            console.log("[SignUp] Registration successful")
             navigate('/verify-otp')
-        } catch (error: unknown) {
-            console.error("Registration Error Details:", error);
-            setError(error instanceof Error ? error.message : "Registration failed. Please try again.")
+        } catch (error: any) {
+            console.error("[SignUp] Registration CRITICAL ERROR:", error);
+            if (error.response) {
+                console.error("[SignUp] Backend Data:", error.response.data);
+                console.error("[SignUp] Status Code:", error.response.status);
+            }
+            setError(error.message || "Registration failed. Please try again.")
         } finally {
             setLoading(false)
         }
