@@ -4,7 +4,8 @@ import axios, { AxiosError } from "axios";
 import type { User } from "../types";
 
 const api = axios.create({
-  baseURL: import.meta.env.PROD ? "https://fortress-backend-og7k.onrender.com/api/v1" : "/api/v1",
+  baseURL: "/api/v1",
+  withCredentials: true, // Re-enabled to send cookies if they are HttpOnly
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,7 +14,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-      // Direct localStorage read to avoid circular dependency issues with authStore
       // 1. Try to get token from localStorage (Zustand)
       let token = null;
       try {
@@ -34,10 +34,11 @@ api.interceptors.request.use(
       // 2. If no token in storage, try to get it from cookies
       if (!token) {
         try {
-            console.log("Interceptor: No token in storage, checking cookies:", document.cookie); // DEBUG LOG
-            const match = document.cookie.match(new RegExp('(^| )accessToken=([^;]+)'));
+            console.log("Interceptor: checking cookies:", document.cookie); // DEBUG LOG
+            // Try identifying token by common names
+            const match = document.cookie.match(new RegExp('(^| )(accessToken|access_token|token)=([^;]+)'));
             if (match) {
-                token = match[2];
+                token = match[3];
                 console.log("Interceptor: Found token in cookie:", token.substring(0, 10) + "..."); // DEBUG LOG
             }
         } catch (e) {
@@ -49,7 +50,7 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
         console.log("Interceptor: Attached Bearer token to header"); // DEBUG LOG
       } else {
-        console.warn("Interceptor: No token found anywhere!"); // DEBUG LOG
+        console.warn("Interceptor: No token found anywhere! withCredentials is TRUE, hoping backend accepts cookie."); // DEBUG LOG
       }
       
       return config;
