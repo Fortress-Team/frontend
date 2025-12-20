@@ -138,7 +138,8 @@ export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse>
   try {
     const response = await api.post("auth/register", {
       ...payload,
-      name: payload.fullName // Send both for backend compatibility
+      name: payload.fullName, // Send both for backend compatibility
+      role: "Talent"         // Default role to avoid backend 500s
     });
     const data = response.data;
     // Robust extraction for potentially nested data

@@ -34,9 +34,10 @@ export const  useAuthStore = create<AuthState>()(
                         token: response.token || "", 
                         isAuthenticated : true
                     });
-                } catch (error : unknown) {
+                } catch (error : any) {
                     console.error("[AuthStore] Login Error:", error);
-                    throw new Error(error instanceof Error ? error.message : "Login failed");
+                    const message = error?.message || error?.data?.message || "Login failed";
+                    throw new Error(message);
                 }
             },
             register : async (fullName : string , email : string , password : string) => {
@@ -47,8 +48,9 @@ export const  useAuthStore = create<AuthState>()(
                         token: response.token || "", 
                         isAuthenticated : true
                     });
-                } catch (error : unknown) {
-                    throw new Error( error instanceof Error ? error.message : "Registration failed");
+                } catch (error : any) {
+                    const message = error?.message || error?.data?.message || "Registration failed";
+                    throw new Error(message);
                 }
             },
             logout : () => {
