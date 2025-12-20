@@ -303,12 +303,16 @@ const EditProfile = () => {
 
     if (loading && isAuthenticated) {
         return (
-            <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <div className="text-neutral-400 font-medium">Loading your details...</div>
-                </div>
-            </div>
+
+            <>
+            <Loader  />
+            </>
+            // <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
+            //     <div className="flex flex-col items-center gap-4">
+            //         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            //         <div className="text-neutral-400 font-medium">Loading your details...</div>
+            //     </div>
+            // </div>
         )
     }
 
