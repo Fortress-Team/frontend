@@ -28,9 +28,10 @@ const ExploreTalents = () => {
 
     const ALL_SKILLS = Array.from(new Set(talents.flatMap(t => t.skills?.filter((s): s is string => typeof s === 'string') ?? []))).sort()
 
- useEffect(() => {
-  fetchAllTalents(page, 5)
-}, [page])
+useEffect(() => {
+  fetchAllTalents(page, 5);
+}, [page, fetchAllTalents]);
+
 
 const getInitials = (name: string) =>
   name
@@ -236,10 +237,7 @@ const handleLogout = () => {
                     {/* Search and Filter Bar */}
 
                     <form
-  onSubmit={(e) => {
-    e.preventDefault(); 
-    handleSearch();      
-  }}
+   onSubmit={handleSearch}
   className="flex flex-col lg:flex-row gap-6 mb-12"
 >
   <div className="relative flex-1 group">
