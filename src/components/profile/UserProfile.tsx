@@ -1,8 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useEffect, useState, useRef } from 'react'
-import { ChevronDown, LogOut, Compass } from 'lucide-react'
+import { ChevronDown, LogOut, Compass, GraduationCap, Github, Linkedin, Twitter, Globe } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+    getEducations, getExperiences, getProjects, getSkills, getUserLinks, getUserProfile
+} from '../../lib/api'
+import type { Education, Experience, Project, Skill, UserLinks, UserProfileData } from '../../lib/api'
+import type { User } from '../../types'
 
 const UserProfile = () => {
     const navigate = useNavigate()
@@ -10,11 +15,50 @@ const UserProfile = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
+    const [experiences, setExperiences] = useState<Experience[]>([])
+    const [educations, setEducations] = useState<Education[]>([])
+    const [projects, setProjects] = useState<Project[]>([])
+    const [skills, setSkills] = useState<Skill[]>([])
+    const [links, setLinks] = useState<UserLinks>({})
+    const [profile, setProfile] = useState<UserProfileData | null>(null)
+    const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         if (!isAuthenticated) {
             navigate('/login')
         }
     }, [isAuthenticated, navigate])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!isAuthenticated) return
+            try {
+                const [expData, eduData, projData, skillData, linksData] = await Promise.all([
+                    getExperiences(),
+                    getEducations(),
+                    getProjects(),
+                    getSkills(),
+                    getUserLinks()
+                ])
+                setExperiences(expData)
+                setEducations(eduData)
+                setProjects(projData)
+                setSkills(skillData)
+                setLinks(linksData)
+
+                const userId = user?._id || (user as User)?._id
+                if (userId) {
+                    const profileData = await getUserProfile(userId)
+                    setProfile(profileData)
+                }
+            } catch (error) {
+                console.error("Error fetching profile data:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [isAuthenticated, user])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -32,10 +76,13 @@ const UserProfile = () => {
     }
 
 
-    if (!user && isAuthenticated) {
+    if (loading && isAuthenticated) {
         return (
             <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
-                <div className="text-neutral-400">Loading profile...</div>
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="text-neutral-400 font-medium animate-pulse">Loading Spotlight Profile...</div>
+                </div>
             </div>
         )
     }
@@ -47,7 +94,6 @@ const UserProfile = () => {
 
     return (
         <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20">
-            {/* Navbar */}
             <nav className="fixed w-full z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link to="/" className="text-2xl font-bold flex items-center gap-2 text-blue-600">
@@ -110,6 +156,7 @@ const UserProfile = () => {
                                 )}
                             </AnimatePresence>
                         </div>
+
                     </div>
                 </div>
             </nav>
@@ -122,21 +169,32 @@ const UserProfile = () => {
 
                 <div className="max-w-7xl mx-auto px-6 -mt-20 relative z-10">
                     <div className="flex flex-col md:flex-row gap-6 items-center md:items-end">
-                        <div className="h-40 w-40 rounded-full bg-white border-4 border-white shadow-xl">
-                            <div className="h-full w-full rounded-full bg-blue-100 flex items-center justify-center text-5xl overflow-hidden border-2 border-blue-200">
-                                <span className="text-blue-600 font-bold">{user.fullName.charAt(0).toUpperCase()}</span>
+                        <div className="h-40 w-40 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden">
+                            <div className="h-full w-full rounded-full bg-blue-100 flex items-center justify-center text-5xl border-2 border-blue-200">
+                                {profile?.avatar ? (
+                                    <img src={profile.avatar} alt={profile.fullName} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-blue-600 font-bold">{user.fullName.charAt(0).toUpperCase()}</span>
+                                )}
                             </div>
                         </div>
                         <div className="mb-4 flex-1 text-center md:text-left">
-                            <h1 className="text-4xl font-bold text-neutral-900 mb-1">{user.fullName}</h1>
-                            <p className="text-neutral-700 font-medium text-lg">Developer</p>
-                            <p className="text-neutral-500 text-sm">{user.email} • Joined Dec 2025</p>
+                            <h1 className="text-4xl font-bold text-neutral-900 mb-1">{profile?.fullName || user.fullName}</h1>
+                            {profile?.profRole && <p className="text-neutral-700 font-medium text-lg">{profile.profRole}</p>}
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1">
+                                <p className="text-neutral-500 text-sm">{profile?.email || user.email}</p>
+                                {profile?.location && (
+                                    <>
+                                        <span className="text-neutral-300 hidden md:block">•</span>
+                                        <p className="text-neutral-500 text-sm">{profile.location}</p>
+                                    </>
+                                )}
+                                <span className="text-neutral-300 hidden md:block">•</span>
+                                <p className="text-neutral-500 text-sm">Joined Dec 2025</p>
+                            </div>
                         </div>
                         <div className="mb-6 flex gap-3">
-                            <button className="px-5 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30">
-                                Connect
-                            </button>
-                            <Link to="/profile/edit" className="px-5 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-white hover:bg-neutral-50 border-2 border-neutral-200 text-neutral-900 font-semibold rounded-xl transition-all block text-center">
+                            <Link to="/profile/edit" className="px-5 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 block text-center">
                                 Edit Profile
                             </Link>
                         </div>
@@ -150,20 +208,31 @@ const UserProfile = () => {
 
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">About</h3>
-                        <p className="text-neutral-600 leading-relaxed text-sm">
-                            Passionate developer with 5+ years of experience building scalable web applications. I love React, Tailwind CSS, and exploring new UI/UX trends. Always learning.
+                        <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
+                            {profile?.bio || (isAuthenticated && (user?._id === profile?.id || (user as User)?._id === (profile as any)?._id) ? "No bio added yet. Tell us about yourself!" : "")}
                         </p>
 
-                        <div className="mt-6 flex flex-wrap gap-4 text-neutral-600">
-                            <a href="#" className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium">
-                                Github
-                            </a>
-                            <a href="#" className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium">
-                                LinkedIn
-                            </a>
-                            <a href="#" className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium">
-                                Twitter
-                            </a>
+                        <div className="mt-6 flex flex-wrap gap-4 text-neutral-400">
+                            {links.github && (
+                                <a href={links.github} target="_blank" rel="noopener noreferrer" title="GitHub" className="hover:text-blue-600 transition-colors p-2 rounded-lg bg-neutral-50 border border-neutral-200">
+                                    <Github size={18} />
+                                </a>
+                            )}
+                            {links.linkedin && (
+                                <a href={links.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn" className="hover:text-blue-600 transition-all p-2 rounded-lg bg-neutral-50 border border-neutral-200">
+                                    <Linkedin size={18} />
+                                </a>
+                            )}
+                            {links.X && (
+                                <a href={links.X} target="_blank" rel="noopener noreferrer" title="Twitter / X" className="hover:text-blue-600 transition-all p-2 rounded-lg bg-neutral-50 border border-neutral-200">
+                                    <Twitter size={18} />
+                                </a>
+                            )}
+                            {links.portfolio && (
+                                <a href={links.portfolio} target="_blank" rel="noopener noreferrer" title="Portfolio" className="hover:text-blue-600 transition-all p-2 rounded-lg bg-neutral-50 border border-neutral-200">
+                                    <Globe size={18} />
+                                </a>
+                            )}
                         </div>
                     </div>
 
@@ -171,11 +240,33 @@ const UserProfile = () => {
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">Skills</h3>
                         <div className="flex flex-wrap gap-2">
-                            {['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Next.js', 'PostgreSQL', 'Figma', 'GraphQL'].map((skill) => (
-                                <span key={skill} className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 transition-colors cursor-default">
-                                    {skill}
+                            {skills.length > 0 ? skills.map((skill) => (
+                                <span key={skill._id} className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 transition-colors cursor-default">
+                                    {skill.title}
                                 </span>
-                            ))}
+                            )) : (
+                                <p className="text-sm text-neutral-400">No skills added yet.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
+                        <h3 className="text-xl font-bold mb-4 text-neutral-900">Education</h3>
+                        <div className="space-y-4">
+                            {educations.length > 0 ? educations.map((edu) => (
+                                <div key={edu._id} className="flex gap-4">
+                                    <div className="h-10 w-10 shrink-0 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                                        <GraduationCap size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-neutral-900">{edu.course}</h4>
+                                        <p className="text-xs text-neutral-600 font-medium">{edu.school}</p>
+                                        <p className="text-[10px] text-neutral-400 mt-0.5">{edu.date}</p>
+                                    </div>
+                                </div>
+                            )) : (
+                                <p className="text-sm text-neutral-400 italic">Education info not updated.</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -186,78 +277,74 @@ const UserProfile = () => {
                     <div>
                         <h3 className="text-2xl font-bold mb-6 flex items-center gap-2 text-neutral-900">
                             Featured Projects
-                            <span className="text-neutral-400 text-sm font-normal">(3)</span>
+                            <span className="text-neutral-400 text-sm font-normal">({projects.length})</span>
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            <div className="group p-5 rounded-2xl bg-white border-2 border-neutral-200 hover:border-blue-300 transition-all hover:shadow-lg">
-                                <div className="h-40 w-full rounded-xl bg-neutral-100 mb-4 overflow-hidden relative border border-neutral-200">
-                                    <div className="absolute bottom-3 left-3 px-3 py-1 bg-white rounded-lg text-xs font-medium border border-neutral-200 shadow-sm text-neutral-700">
-                                        Open Source
+                        {projects.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {projects.map((proj) => (
+                                    <div key={proj._id} className="group p-6 rounded-2xl bg-white border-2 border-neutral-200 hover:border-blue-300 transition-all hover:shadow-lg flex flex-col">
+                                        {proj.projectImg && (
+                                            <div className="h-40 w-full rounded-xl bg-neutral-100 mb-4 overflow-hidden border border-neutral-200">
+                                                {proj.link ? (
+                                                    <a href={proj.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                                        <img src={proj.projectImg} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                    </a>
+                                                ) : (
+                                                    <img src={proj.projectImg} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                )}
+                                            </div>
+                                        )}
+                                        {proj.link ? (
+                                            <a href={proj.link} target="_blank" rel="noopener noreferrer" className="block group/link">
+                                                <h4 className="text-lg font-bold mb-2 text-neutral-900 group-hover:text-blue-600 transition-colors inline-block relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 group-hover/link:after:w-full after:transition-all">
+                                                    {proj.title}
+                                                </h4>
+                                            </a>
+                                        ) : (
+                                            <h4 className="text-lg font-bold mb-2 text-neutral-900 group-hover:text-blue-600 transition-colors">
+                                                {proj.title}
+                                            </h4>
+                                        )}
+                                        <div className="flex gap-2 mb-3 items-center">
+                                            {proj.date && <span className="text-[10px] bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">{proj.date}</span>}
+                                        </div>
+                                        <p className="text-neutral-600 text-sm leading-relaxed mb-4 grow">
+                                            {proj.desc}
+                                        </p>
                                     </div>
-                                </div>
-                                <h4 className="text-lg font-bold mb-2 text-neutral-900 group-hover:text-blue-600 transition-colors">E-Commerce Dashboard</h4>
-                                <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
-                                    A fully functional admin dashboard with real-time analytics, inventory management.
-                                </p>
-                                <div className="flex items-center justify-between text-xs text-neutral-500">
-                                    <div className="flex gap-3">
-                                        <span className="flex items-center gap-1 font-medium text-neutral-700">⭐ 142</span>
-                                        <span className="flex items-center gap-1 font-medium text-neutral-700">🔱 23</span>
-                                    </div>
-                                    <span>TypeScript • React</span>
-                                </div>
+                                ))}
                             </div>
-
-
-                            <div className="group p-5 rounded-2xl bg-white border-2 border-neutral-200 hover:border-blue-300 transition-all hover:shadow-lg">
-                                <div className="h-40 w-full rounded-xl bg-neutral-100 mb-4 overflow-hidden relative border border-neutral-200">
-                                    <div className="absolute bottom-3 left-3 px-3 py-1 bg-white rounded-lg text-xs font-medium border border-neutral-200 shadow-sm text-neutral-700">
-                                        SaaS
-                                    </div>
-                                </div>
-                                <h4 className="text-lg font-bold mb-2 text-neutral-900 group-hover:text-blue-600 transition-colors">TaskMaster Pro</h4>
-                                <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
-                                    Collaborative task management tool for remote teams with video integration.
-                                </p>
-                                <div className="flex items-center justify-between text-xs text-neutral-500">
-                                    <div className="flex gap-3">
-                                        <span className="flex items-center gap-1 font-medium text-neutral-700">⭐ 89</span>
-                                        <span className="flex items-center gap-1 font-medium text-neutral-700">🔱 12</span>
-                                    </div>
-                                    <span>Next.js • Prisma</span>
-                                </div>
+                        ) : (
+                            <div className="bg-neutral-50 rounded-2xl border-2 border-dashed border-neutral-200 py-12 text-center text-neutral-400">
+                                No projects featured yet.
                             </div>
-                        </div>
+                        )}
                     </div>
 
 
                     <div>
                         <h3 className="text-2xl font-bold mb-6 text-neutral-900">Experience</h3>
                         <div className="space-y-6">
-
-                            <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 hover:border-neutral-300 transition-colors shadow-sm">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
-                                    <h4 className="text-lg font-bold text-neutral-900">Senior Frontend Engineer</h4>
-                                    <span className="text-sm text-neutral-500 font-medium">2023 - Present</span>
+                            {experiences.length > 0 ? experiences.map((exp) => (
+                                <div key={exp._id} className="p-6 rounded-2xl bg-white border-2 border-neutral-200 hover:border-neutral-300 transition-colors shadow-sm relative group">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 className="font-bold text-lg text-neutral-900">{exp.position}</h3>
+                                            <p className="font-medium text-neutral-700">{exp.title}</p>
+                                        </div>
+                                        <span className="text-sm font-medium text-neutral-500 bg-neutral-100 px-3 py-1 rounded-lg border border-neutral-200">
+                                            {exp.date}
+                                        </span>
+                                    </div>
+                                    <p className="text-neutral-600 text-sm leading-relaxed mt-2">
+                                        {exp.desc}
+                                    </p>
                                 </div>
-                                <div className="text-neutral-700 text-sm font-medium mb-4">TechCorp Inc.</div>
-                                <p className="text-neutral-600 text-sm leading-relaxed">
-                                    Leading the frontend team in migrating legacy codebase to Next.js. Improved site performance by 40% and established a new design system.
-                                </p>
-                            </div>
-
-
-                            <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 hover:border-neutral-300 transition-colors shadow-sm">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
-                                    <h4 className="text-lg font-bold text-neutral-900">Frontend Developer</h4>
-                                    <span className="text-sm text-neutral-500 font-medium">2021 - 2023</span>
+                            )) : (
+                                <div className="bg-neutral-50 rounded-2xl border-2 border-dashed border-neutral-200 py-12 text-center text-neutral-400">
+                                    No professional experience listed.
                                 </div>
-                                <div className="text-neutral-700 text-sm font-medium mb-4">Creative Agency</div>
-                                <p className="text-neutral-600 text-sm leading-relaxed">
-                                    Built responsive websites for high-profile clients. Collaborated closely with designers to implement pixel-perfect UIs with complex animations.
-                                </p>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>

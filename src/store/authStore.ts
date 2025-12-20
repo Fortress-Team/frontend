@@ -10,7 +10,6 @@ import type { User } from "../types";
 // }
 
 interface AuthState {
-    token : string | null ;
     user : User | null;
     isAuthenticated : boolean ;
     login : (email : string , password : string) =>Promise<void>;
@@ -23,14 +22,14 @@ interface AuthState {
 export const  useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
-            token : null,
             user : null,
             isAuthenticated : false,
             login : async (email : string , password : string) => {
                 try {
                     const response = await LoginUser({email , password});
-                    set({ user : response.user || null , isAuthenticated : true});
+                    set({  user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
+                    console.error("[AuthStore] Login Error:", error);
                     throw new Error(error instanceof Error ? error.message : "Login failed");
                 }
             },
@@ -43,12 +42,12 @@ export const  useAuthStore = create<AuthState>()(
                 }
             },
             logout : () => {
-                set({token : null , user : null , isAuthenticated : false});
+                set({ user : null , isAuthenticated : false});
             },
             verifyOTP : async (otp : string) => {
                 try {
                     const response = await VerifyOTP(otp);
-                    set({ user : response.user || null , isAuthenticated : true});
+                    set({user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error(error instanceof Error ? error.message : "OTP verification failed");
                 }
@@ -56,7 +55,6 @@ export const  useAuthStore = create<AuthState>()(
         }),
         {
             name : "auth-storage",
-            
         }
     )
 )

@@ -145,17 +145,17 @@ console.log('API_URL:',API_URL)
 
     if (res.ok) {
       set({ talents: data, loading: false });
-      return data; // <-- User[]
+      return data; 
     } else {
       console.error('Search failed:', data.message);
       set({ loading: false });
-      return; // <-- void
+      return; 
     }
   } catch (error: unknown) {
     console.error("Search error:", error);
     const errorMessage = error instanceof Error ? error.message : "Failed to fetch users";
     set({ loading: false, message: errorMessage });
-    return; // <-- void
+    return;
   }
 },
 

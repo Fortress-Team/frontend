@@ -15,10 +15,12 @@ const UserProfileDetails = lazy(() => import('./components/profile/details'))
 const EditProfile = lazy(() => import('./components/profile/EditProfile'))
 const ExploreTalents = lazy(() => import('./components/landing-page/explore/index'))
 
+import { Toaster } from 'sonner'
+
 function App() {
   return (
     <Suspense fallback={<Loader />}>
-
+      <Toaster position="top-center" richColors />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/explore" element={<ExploreTalents />} />

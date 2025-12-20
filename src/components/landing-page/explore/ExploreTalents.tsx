@@ -1,12 +1,13 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Filter, X, Menu } from 'lucide-react'
+import { Search, Filter, X, Menu, Compass, ChevronDown, LogOut } from 'lucide-react'
 import { useTalentStore } from '../../../store/talentStore'
 import Pagination from './pagination'
 import Card from './card'
 import type { Project } from '../../../types'
 import type { Skill } from '../../../types/skill.type'
+import { useAuthStore } from '../../../store/authStore'
 
 // Mock talent data
 
@@ -15,13 +16,15 @@ const ExploreTalents = () => {
 
 
     const {talents, fetchAllTalents, totalPage,loading, searchTalents} = useTalentStore()
-
+ const { user, isAuthenticated, logout } = useAuthStore()
     const navigate = useNavigate()
   const [page,setPage] = useState<number>(1)
    const totalPages = totalPage ?? 1
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedSkills, setSelectedSkills] = useState<string[]>([])
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+        const dropdownRef = useRef<HTMLDivElement>(null)
 
     const ALL_SKILLS = Array.from(new Set(talents.flatMap(t => t.skills?.filter((s): s is string => typeof s === 'string') ?? []))).sort()
 
@@ -81,6 +84,16 @@ useEffect(() => {
 }, [searchQuery]);
 
 
+const handleLogout = () => {
+        logout()
+        navigate('/')
+    }
+
+        useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login')
+        }
+    }, [isAuthenticated, navigate])
 
     return (
         <div className="min-h-screen bg-white text-neutral-900 font-sans">
@@ -96,8 +109,77 @@ useEffect(() => {
                     <div className="hidden md:flex gap-8 items-center text-sm font-medium">
                         <Link to="/" className="text-neutral-500 hover:text-neutral-900 transition-colors">Home</Link>
                         <Link to="/explore" className="text-blue-600">Explore</Link>
-                        <Link to="/profile" className="text-neutral-500 hover:text-neutral-900 transition-colors">Profile</Link>
-                        <Link to="/login" className="px-5 py-2.5 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors">Log In</Link>
+                    
+          { !user ?            <Link to="/login" className="px-5 py-2.5 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors">Log In</Link>
+:
+     <div className="relative" ref={dropdownRef}>
+                            <button
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
+                            >
+                                <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
+                                    {user && user.fullName.charAt(0).toUpperCase()}
+                                </div>
+                                <ChevronDown
+                                    size={18}
+                                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                />
+                            </button>
+
+                            <AnimatePresence>
+                                {isDropdownOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.15, ease: "easeOut" }}
+                                        className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+                                    >
+                                        <div className="px-4 py-3 border-b border-neutral-100 mb-2">
+                                            <p className="text-sm font-bold text-neutral-900 truncate">{user?.fullName ?? ''}</p>
+                                            <p className="text-xs text-neutral-500 truncate">{user?.email ?? ''}</p>
+                                        </div>
+
+
+                                        <Link
+                                            to="/explore"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2 
+                                            text-sm text-neutral-700 hover:bg-neutral-50
+                                             hover:text-blue-600 transition-colors md:hidden"
+                                        >
+                                            <Compass size={18} />
+                                            Explore
+                                        </Link>
+
+
+                                           <Link
+                                            to="/profile"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2 
+                                            text-sm text-neutral-700 hover:bg-neutral-50
+                                             hover:text-blue-600 transition-colors "
+                                        >
+                                            <Compass size={18} />
+                                            Profile
+                                        </Link>
+
+                                            {/* <Link to="/profile" className="text-neutral-500 hover:text-neutral-900 transition-colors">Profile</Link> */}
+
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+                                        >
+                                            <LogOut size={18} />
+                                            Logout
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        }
+                        
                     </div>
 
                     <button onClick={() => setIsMenuOpen(true)} className="md:hidden p-2 text-neutral-900">
