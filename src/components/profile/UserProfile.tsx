@@ -81,7 +81,7 @@ const UserProfile = () => {
         return (
 
             <>
-            <Loader />
+                <Loader />
             </>
             // <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
             //     <div className="flex flex-col items-center gap-4">
@@ -175,7 +175,7 @@ const UserProfile = () => {
                 <div className="max-w-7xl mx-auto px-6 -mt-20 relative z-10">
                     <div className="flex flex-col md:flex-row gap-6 items-center md:items-end">
                         <div className="h-40 w-40 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden">
-                            <div className="h-full w-full rounded-full bg-blue-100 flex items-center justify-center text-5xl border-2 border-blue-200">
+                            <div className="h-full w-full rounded-full bg-blue-100 flex items-center justify-center text-5xl border-2  border-blue-200">
                                 {profile?.avatar ? (
                                     <img src={profile.avatar} alt={profile.fullName} className="w-full h-full object-cover" />
                                 ) : (
@@ -183,7 +183,7 @@ const UserProfile = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="mb-4 flex-1 text-center md:text-left">
+                        <div className="mb-4 md:mb-1 flex-1 text-center md:text-left">
                             <h1 className="text-4xl font-bold text-neutral-900 mb-1">{profile?.fullName || user.fullName}</h1>
                             {profile?.profRole && <p className="text-neutral-700 font-medium text-lg">{profile.profRole}</p>}
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1">

@@ -280,20 +280,35 @@ const EditProfile = () => {
         }
         setIsSaving(true)
         try {
+
+            const bio = basicInfo.bio || "Tell us about yourself!";
+            const location = basicInfo.location || "Global";
+            const profRole = basicInfo.profRole || "Talent";
+            const avatar = basicInfo.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(basicInfo.fullName || user?.fullName || "User")}&background=dbeafe&color=2563eb&size=512`;
+
+            const githubLink = socialLinks.github || "https://github.com/username";
+            const linkedinLink = socialLinks.linkedin || "https://linkedin.com/in/username";
+            const xLink = socialLinks.X || "https://x.com/username";
+            const portfolioLink = socialLinks.portfolio || "https://portfolio.com";
+
             await Promise.all([
-                upsertUserLinks(socialLinks),
+                upsertUserLinks({
+                    github: githubLink,
+                    linkedin: linkedinLink,
+                    X: xLink,
+                    portfolio: portfolioLink
+                }),
                 updateUserProfile(userId, {
                     fullName: basicInfo.fullName,
-                    profRole: basicInfo.profRole,
-                    location: basicInfo.location,
-                    bio: basicInfo.bio,
-                    avatar: basicInfo.avatar
+                    profRole,
+                    location,
+                    bio,
+                    avatar
                 })
             ])
             toast.success('Profile updated successfully!')
             window.location.href = '/profile'
         } catch (error: unknown) {
-
             const errorMessage = error instanceof Error ? error.message : "Internal server error";
             console.log(errorMessage)
             toast.error(errorMessage || 'Failed to save profile. Please try again.')
@@ -306,7 +321,7 @@ const EditProfile = () => {
         return (
 
             <>
-            <Loader  />
+                <Loader />
             </>
             // <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
             //     <div className="flex flex-col items-center gap-4">
@@ -467,7 +482,19 @@ const EditProfile = () => {
                                     if (!userId) { toast.error("Please login"); return; }
                                     setIsSaving(true);
                                     try {
-                                        await updateUserProfile(userId, basicInfo);
+                                        // APPLY SMART DEFAULTS
+                                        const bio = basicInfo.bio || "Tell us about yourself!";
+                                        const location = basicInfo.location || "Global";
+                                        const profRole = basicInfo.profRole || "Talent";
+                                        const avatar = basicInfo.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(basicInfo.fullName || user?.fullName || "User")}&background=dbeafe&color=2563eb&size=512`;
+
+                                        await updateUserProfile(userId, {
+                                            ...basicInfo,
+                                            bio,
+                                            location,
+                                            profRole,
+                                            avatar
+                                        });
                                         toast.success('Basic information updated!');
                                         window.location.href = '/profile';
                                     } catch (error: any) {
@@ -539,7 +566,18 @@ const EditProfile = () => {
                                 onClick={async () => {
                                     setIsSaving(true);
                                     try {
-                                        await upsertUserLinks(socialLinks);
+                                        // APPLY SMART DEFAULTS
+                                        const githubLink = socialLinks.github || "https://github.com/username";
+                                        const linkedinLink = socialLinks.linkedin || "https://linkedin.com/in/username";
+                                        const xLink = socialLinks.X || "https://x.com/username";
+                                        const portfolioLink = socialLinks.portfolio || "https://portfolio.com";
+
+                                        await upsertUserLinks({
+                                            github: githubLink,
+                                            linkedin: linkedinLink,
+                                            X: xLink,
+                                            portfolio: portfolioLink
+                                        });
                                         toast.success('Social links updated!');
                                         // Refresh to show updates
                                         window.location.href = '/profile';

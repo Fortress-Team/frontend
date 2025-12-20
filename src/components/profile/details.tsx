@@ -434,7 +434,7 @@ const Navs = ({ talent }: NavsProps) => {
               </div>
             </div>
 
-            <div className="mb-4 flex-1 text-center md:text-left">
+            <div className="mb-4 md:mb-1 flex-1 text-center md:text-left">
               <h1 className="text-4xl font-bold text-neutral-900 mb-1">
                 {talent.fullName}
               </h1>
