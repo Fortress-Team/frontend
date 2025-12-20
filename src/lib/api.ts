@@ -15,18 +15,11 @@ api.interceptors.request.use(
     (config) => {
       // Direct localStorage read to avoid circular dependency issues with authStore
       try {
-        const storageData = localStorage.getItem('auth-storage');
-        console.log("Interceptor: Reading storage 'auth-storage':", storageData ? "Found data" : "NULL");
-
+        const storageData = localStorage.getItem('auth-storage-v2');
         if (storageData) {
           const { state } = JSON.parse(storageData);
-          console.log("Interceptor: Parsed state:", state ? "Found state" : "No state", "Token:", state?.token ? "Found token" : "No token");
-          
           if (state && state.token) {
             config.headers.Authorization = `Bearer ${state.token}`;
-            console.log("Interceptor: Attached Bearer token");
-          } else {
-            console.warn("Interceptor: Token missing in state");
           }
         }
       } catch (e) {
