@@ -1,10 +1,11 @@
 import axios, { AxiosError } from "axios";
+//  circular dependency
 // import { useAuthStore } from "../store/authStore";
 import type { User } from "../types";
 
 const api = axios.create({
   baseURL: "/api/v1",
-  withCredentials: true,
+  withCredentials: true, // Re-enabled to send cookies if they are HttpOnly
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,7 +13,48 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-    (config) => config,
+    (config) => {
+      // 1. Try to get token from localStorage (Zustand)
+      let token = null;
+      try {
+        const storageData = localStorage.getItem('auth-storage-v2');
+        console.log("Interceptor: Reading 'auth-storage-v2':", storageData); // DEBUG LOG
+        if (storageData) {
+          const { state } = JSON.parse(storageData);
+          console.log("Interceptor: Parsed state for token:", state); // DEBUG LOG
+          if (state && state.token) {
+            token = state.token;
+            console.log("Interceptor: Found token in storage:", token.substring(0, 10) + "..."); // DEBUG LOG
+          }
+        }
+      } catch (e) {
+        console.error("Error reading token from storage", e);
+      }
+
+      // 2. If no token in storage, try to get it from cookies
+      if (!token) {
+        try {
+            console.log("Interceptor: checking cookies:", document.cookie); // DEBUG LOG
+            // Try identifying token by common names
+            const match = document.cookie.match(new RegExp('(^| )(accessToken|access_token|token)=([^;]+)'));
+            if (match) {
+                token = match[3];
+                console.log("Interceptor: Found token in cookie:", token.substring(0, 10) + "..."); // DEBUG LOG
+            }
+        } catch (e) {
+            console.error("Error reading token from cookie", e);
+        }
+      }
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log("Interceptor: Attached Bearer token to header"); // DEBUG LOG
+      } else {
+        console.warn("Interceptor: No token found anywhere! withCredentials is TRUE, hoping backend accepts cookie."); // DEBUG LOG
+      }
+      
+      return config;
+    },
     (error) => Promise.reject(error)
 );
 
@@ -104,7 +146,11 @@ const handleError = (error: any, defaultMsg: string) => {
 export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/register", payload);
-    return response.data;
+    const data = response.data;
+    // Robust extraction for potentially nested data
+    const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
+    const user = data.user || data.data?.user || data.data;
+    return { ...data, token, user };
   } catch (error) {
     throw handleError(error, "Registration failed");
   }
@@ -115,7 +161,13 @@ export const LoginUser = async (
 ): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/login", payload);
-    return response.data;
+    const data = response.data;
+    console.log("Login Response Data:", data); // DEBUG LOG
+    // Robust extraction for potentially nested data
+    const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
+    const user = data.user || data.data?.user || data.data;
+    console.log("Login Extracted Token:", token); // DEBUG LOG
+    return { ...data, token, user };
   } catch (error) {
     throw handleError(error, "Login failed");
   }
@@ -124,7 +176,11 @@ export const LoginUser = async (
 export const VerifyOTP = async (otp: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/verify-otp", { OTP: otp });
-    return response.data;
+    const data = response.data;
+    // Robust extraction for potentially nested data
+    const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
+    const user = data.user || data.data?.user || data.data;
+    return { ...data, token, user };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       // AxiosError type provides the `response` property

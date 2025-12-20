@@ -12,7 +12,7 @@ const Login = () => {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
-    const [showPass, setShowPass]=  useState(false)
+    const [showPass, setShowPass] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -36,7 +36,7 @@ const Login = () => {
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
             <div className="max-w-2xl w-full">
-              
+
                 <Link to="/" className="inline-block mb-12">
                     <div className="text-3xl font-bold text-blue-600 flex items-center gap-2">
                         <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
@@ -44,7 +44,7 @@ const Login = () => {
                     </div>
                 </Link>
 
-            
+
                 <div className="text-center mb-8 md:mb-10">
                     <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-3">
                         Welcome back
@@ -66,7 +66,7 @@ const Login = () => {
 
                 </div>
 
-          
+
                 <div className="relative mb-8">
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-neutral-200"></div>
@@ -76,7 +76,7 @@ const Login = () => {
                     </div>
                 </div>
 
-              
+
                 <form onSubmit={handleSubmit} className="space-y-5">
 
                     <div>
@@ -94,43 +94,43 @@ const Login = () => {
                         />
                     </div>
 
-              
+
 
                     <div>
-  <div className="flex items-center justify-between mb-2">
-    <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
-      Password
-    </label>
-    <Link
-      to="/forgot-password"
-      className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-    >
-      Forgot password?
-    </Link>
-  </div>
+                        <div className="flex items-center justify-between mb-2">
+                            <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
+                                Password
+                            </label>
+                            <Link
+                                to="/forgot-password"
+                                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
 
-  {/* Input wrapper */}
-  <div className="relative">
-    <input
-      type={showPass ? "text" : "password"}
-      id="password"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      className="w-full px-4 py-3.5 pr-12 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
-      placeholder="Enter your password"
-      required
-    />
+                        {/* Input wrapper */}
+                        <div className="relative">
+                            <input
+                                type={showPass ? "text" : "password"}
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-4 py-3.5 pr-12 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
+                                placeholder="Enter your password"
+                                required
+                            />
 
-    {/* Eye toggle */}
-    <button
-      type="button"
-      onClick={() => setShowPass(!showPass)}
-      className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
-    >
-      {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
-    </button>
-  </div>
-</div>
+                            {/* Eye toggle */}
+                            <button
+                                type="button"
+                                onClick={() => setShowPass(!showPass)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
+                            >
+                                {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                        </div>
+                    </div>
 
 
                     {error && (
@@ -148,7 +148,7 @@ const Login = () => {
                     </button>
                 </form>
 
-           
+
                 <div className="mt-8 text-center text-sm text-neutral-600">
                     Don't have an account?{' '}
                     <Link to="/signup" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">

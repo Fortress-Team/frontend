@@ -134,8 +134,8 @@ const EditProfile = () => {
                 setNewProject(prev => ({ ...prev, projectImg: url }))
                 toast.success("Project image uploaded!")
             }
-      } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Internal server error";
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Internal server error";
             console.log(errorMessage)
             toast.error(errorMessage || "Image upload failed. Please try again.")
         } finally {
@@ -179,9 +179,13 @@ const EditProfile = () => {
                 setNewExperience({ title: '', position: '', date: '', desc: '' })
                 setIsAddingExperience(false)
                 toast.success("Experience added!")
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to add experience:", error)
-                toast.error("Failed to add experience")
+                const status = error.response?.status;
+                const message = error.response?.data?.message || error.message;
+                if (status === 401) toast.error("401 Unauthorized");
+                else if (error.code === "ERR_NETWORK") toast.error("CORS Error");
+                else toast.error(`Error: ${message}`);
             } finally {
                 setIsSubmitting({ type: null })
             }
@@ -212,9 +216,13 @@ const EditProfile = () => {
                 setNewProject({ title: '', date: '', projectImg: '', desc: '', link: '' })
                 setIsAddingProject(false)
                 toast.success("Project added!")
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to add project:", error)
-                toast.error("Failed to add project")
+                const status = error.response?.status;
+                const message = error.response?.data?.message || error.message || "Unknown error";
+                if (status === 401) toast.error("401 Unauthorized. Relogin.");
+                else if (error.code === "ERR_NETWORK") toast.error("CORS/Network Error.");
+                else toast.error(`Error: ${message}`);
             } finally {
                 setIsSubmitting({ type: null })
             }
@@ -239,9 +247,13 @@ const EditProfile = () => {
                 setNewEducation({ course: '', school: '', date: '' })
                 setIsAddingEducation(false)
                 toast.success("Education added!")
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to add education:", error)
-                toast.error("Failed to add education")
+                const status = error.response?.status;
+                const message = error.response?.data?.message || error.message;
+                if (status === 401) toast.error("401 Unauthorized");
+                else if (error.code === "ERR_NETWORK") toast.error("CORS Error");
+                else toast.error(`Error: ${message}`);
             } finally {
                 setIsSubmitting({ type: null })
             }
@@ -279,11 +291,11 @@ const EditProfile = () => {
             ])
             toast.success('Profile updated successfully!')
             navigate('/profile')
-         } catch (error: unknown) {
- 
-      const errorMessage = error instanceof Error ? error.message : "Internal server error";
-   console.log(errorMessage)
-   toast.error(errorMessage || 'Failed to save profile. Please try again.')
+        } catch (error: unknown) {
+
+            const errorMessage = error instanceof Error ? error.message : "Internal server error";
+            console.log(errorMessage)
+            toast.error(errorMessage || 'Failed to save profile. Please try again.')
         } finally {
             setIsSaving(false)
         }
@@ -396,7 +408,7 @@ const EditProfile = () => {
                                 <label
                                     htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
                                 <input
-                                id='name'
+                                    id='name'
                                     type="text"
                                     name="fullName"
                                     value={basicInfo.fullName}
@@ -409,7 +421,7 @@ const EditProfile = () => {
                                 <label
                                     htmlFor="role" className="block text-sm font-medium text-neutral-700 mb-2">Professional Role</label>
                                 <input
-                                id="role"
+                                    id="role"
                                     type="text"
                                     name="profRole"
                                     value={basicInfo.profRole}
@@ -421,7 +433,7 @@ const EditProfile = () => {
                                 <label
                                     htmlFor="location" className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
                                 <input
-                                id='location'
+                                    id='location'
                                     type="text"
                                     name="location"
                                     value={basicInfo.location}
@@ -430,10 +442,10 @@ const EditProfile = () => {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <label     htmlFor="bio"
-                                className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
+                                <label htmlFor="bio"
+                                    className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
                                 <textarea
-                                id='bio'
+                                    id='bio'
                                     name="bio"
                                     value={basicInfo.bio}
                                     onChange={handleBasicInfoChange}
