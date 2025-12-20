@@ -143,8 +143,7 @@ const handleError = (error: any, defaultMsg: string) => {
 export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/register", {
-      name: payload.fullName,    // Standard
-      fullName: payload.fullName, // Legacy/Alias
+      fullName: payload.fullName,
       email: payload.email,
       password: payload.password
     });
