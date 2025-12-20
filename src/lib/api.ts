@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { useAuthStore } from "../store/authStore";
+import type { User } from "../types";
 
 const api = axios.create({
   baseURL: "https://fortress-backend-og7k.onrender.com/api/v1",
@@ -26,11 +27,7 @@ api.interceptors.request.use(
 interface AuthResponse {
   message: string;
   status?: number;
-  user?: {
-    fullName: string;
-    email: string;
-    id: string;
-  };
+  user?: User
   token?: string;
 }
 
@@ -39,13 +36,13 @@ interface ApiError {
   errors?: string[];
 }
 
-interface RegisterUserProps {
+interface RegisterUser {
   fullName: string;
   email: string;
   password: string;
 }
 
-interface LoginUserProps {
+interface LoginUser {
   email: string;
   password: string;
 }
@@ -56,7 +53,7 @@ interface ResetPasswordProps {
 }
 
 export const RegisterUser = async (
-  payload: RegisterUserProps
+  payload: RegisterUser
 ): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/register", payload);
@@ -68,7 +65,7 @@ export const RegisterUser = async (
 };
 
 export const LoginUser = async (
-  payload: LoginUserProps
+  payload: LoginUser
 ): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/login", payload);
@@ -83,8 +80,12 @@ export const VerifyOTP = async (otp: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/verify-otp", { OTP: otp });
     return response.data;
-  } catch (error: any) {
-    throw error.response?.data || { message: "Server error" };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      // AxiosError type provides the `response` property
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
 
@@ -92,27 +93,36 @@ export const ResendOTP = async (email: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/resend-otp", { email });
     return response.data;
-  } catch (error: any) {
-    throw error.response?.data || { message: "Server error" };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
-
 
 export const ForgotPassword = async (email: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/forgot-password", { email });
     return response.data;
-  } catch (error: any) {
-    throw error.response?.data || { message: "Server error" };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
+
 
 export const ResetPassword = async (payload: ResetPasswordProps): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/reset-password", payload);
     return response.data;
-  } catch (error: any) {
-    throw error.response?.data || { message: "Server error" };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
 

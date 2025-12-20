@@ -1,12 +1,13 @@
 import { LoginUser, RegisterUser, VerifyOTP } from "../lib/api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { User } from "../types";
 
-interface User {
-    fullName: string;
-    email: string;
-    id: string;
-}
+// interface User {
+//     fullName: string;
+//     email: string;
+//     id: string;
+// }
 
 interface AuthState {
     token : string | null ;
@@ -28,7 +29,7 @@ export const  useAuthStore = create<AuthState>()(
             login : async (email : string , password : string) => {
                 try {
                     const response = await LoginUser({email , password});
-                    set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
+                    set({ user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error(error instanceof Error ? error.message : "Login failed");
                 }
@@ -36,7 +37,7 @@ export const  useAuthStore = create<AuthState>()(
             register : async (fullName : string , email : string , password : string) => {
                 try {
                     const response = await RegisterUser({fullName , email , password});
-                    set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
+                    set({ user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error( error instanceof Error ? error.message : "Registration failed");
                 }
@@ -47,7 +48,7 @@ export const  useAuthStore = create<AuthState>()(
             verifyOTP : async (otp : string) => {
                 try {
                     const response = await VerifyOTP(otp);
-                    set({token : response.user?.id || null , user : response.user || null , isAuthenticated : true});
+                    set({ user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error(error instanceof Error ? error.message : "OTP verification failed");
                 }

@@ -152,8 +152,10 @@ const EditProfile = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
+                                <label
+                                    htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
                                 <input
+                                id='name'
                                     type="text"
                                     name="name"
                                     value={basicInfo.name}
@@ -161,9 +163,12 @@ const EditProfile = () => {
                                     className="w-full px-4 py-3 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Professional Role</label>
+                                <label
+                                    htmlFor="role" className="block text-sm font-medium text-neutral-700 mb-2">Professional Role</label>
                                 <input
+                                id="role"
                                     type="text"
                                     name="role"
                                     value={basicInfo.role}
@@ -172,8 +177,10 @@ const EditProfile = () => {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
+                                <label
+                                    htmlFor="location" className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
                                 <input
+                                id='location'
                                     type="text"
                                     name="location"
                                     value={basicInfo.location}
@@ -182,8 +189,10 @@ const EditProfile = () => {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
+                                <label     htmlFor="bio"
+                                className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
                                 <textarea
+                                id='bio'
                                     name="bio"
                                     value={basicInfo.bio}
                                     onChange={handleBasicInfoChange}
