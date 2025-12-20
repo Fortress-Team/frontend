@@ -11,8 +11,9 @@ const VerifyOTP = lazy(() => import('./components/auth/VerifyOTP'))
 const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword'))
 const ResetPassword = lazy(() => import('./components/auth/ResetPassword'))
 const UserProfile = lazy(() => import('./components/profile/UserProfile'))
+const UserProfileDetails = lazy(() => import('./components/profile/details'))
 const EditProfile = lazy(() => import('./components/profile/EditProfile'))
-const ExploreTalents = lazy(() => import('./components/explore/ExploreTalents'))
+const ExploreTalents = lazy(() => import('./components/landing-page/explore/index'))
 
 import { Toaster } from 'sonner'
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path='/profile/:id'  element={<UserProfileDetails  />}  />
         <Route path="/profile/edit" element={<EditProfile />} />
       </Routes>
 

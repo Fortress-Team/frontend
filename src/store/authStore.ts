@@ -1,12 +1,13 @@
 import { LoginUser, RegisterUser, VerifyOTP } from "../lib/api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { User } from "../types";
 
-interface User {
-    fullName: string;
-    email: string;
-    id: string;
-}
+// interface User {
+//     fullName: string;
+//     email: string;
+//     id: string;
+// }
 
 interface AuthState {
     user : User | null;
@@ -26,12 +27,7 @@ export const  useAuthStore = create<AuthState>()(
             login : async (email : string , password : string) => {
                 try {
                     const response = await LoginUser({email , password});
-                    console.log("[AuthStore] Login Success:", response);
-                    const userData = response.user ? {
-                        ...response.user,
-                        id: response.user.id || (response.user as any)._id
-                    } : null;
-                    set({user : userData , isAuthenticated : true});
+                    set({  user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     console.error("[AuthStore] Login Error:", error);
                     throw new Error(error instanceof Error ? error.message : "Login failed");
@@ -40,11 +36,7 @@ export const  useAuthStore = create<AuthState>()(
             register : async (fullName : string , email : string , password : string) => {
                 try {
                     const response = await RegisterUser({fullName , email , password});
-                    const userData = response.user ? {
-                        ...response.user,
-                        id: response.user.id || (response.user as any)._id
-                    } : null;
-                    set({ user : userData , isAuthenticated : true});
+                    set({ user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error( error instanceof Error ? error.message : "Registration failed");
                 }
@@ -55,11 +47,7 @@ export const  useAuthStore = create<AuthState>()(
             verifyOTP : async (otp : string) => {
                 try {
                     const response = await VerifyOTP(otp);
-                    const userData = response.user ? {
-                        ...response.user,
-                        id: response.user.id || (response.user as any)._id
-                    } : null;
-                    set({ user : userData , isAuthenticated : true});
+                    set({user : response.user || null , isAuthenticated : true});
                 } catch (error : unknown) {
                     throw new Error(error instanceof Error ? error.message : "OTP verification failed");
                 }

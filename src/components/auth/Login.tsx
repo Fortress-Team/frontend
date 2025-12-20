@@ -21,8 +21,8 @@ const Login = () => {
         try {
             await login(email, password)
             navigate('/profile')
-        } catch (error: any) {
-            setError(error.message || "Login failed. Please check your credentials.")
+        } catch (error: unknown) {
+            setError(error instanceof Error ? error.message : "Login failed. Please check your credentials.")
         } finally {
             setLoading(false)
         }

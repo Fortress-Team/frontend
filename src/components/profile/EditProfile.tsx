@@ -12,6 +12,7 @@ import type { Education, Experience, Project, Skill, UserLinks } from '../../lib
 import { Trash2, Plus, Upload, Loader2, Link as LinkIcon } from 'lucide-react'
 import { uploadImage } from '../../lib/cloudinary'
 import { toast } from 'sonner'
+import type { User } from '../../types'
 
 const EditProfile = () => {
     const navigate = useNavigate()
@@ -91,7 +92,7 @@ const EditProfile = () => {
                 setSkills(skillData)
                 setSocialLinks(linksData)
 
-                const userId = user?.id || (user as any)?._id
+                const userId = user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setBasicInfo({
@@ -133,9 +134,10 @@ const EditProfile = () => {
                 setNewProject(prev => ({ ...prev, projectImg: url }))
                 toast.success("Project image uploaded!")
             }
-        } catch (error: any) {
-            console.error("Upload failed:", error)
-            toast.error(error.message || "Image upload failed. Please try again.")
+      } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Internal server error";
+            console.log(errorMessage)
+            toast.error(errorMessage || "Image upload failed. Please try again.")
         } finally {
             setIsUploading({ type: null })
         }
@@ -258,7 +260,7 @@ const EditProfile = () => {
     const [isSaving, setIsSaving] = useState(false)
 
     const handleSave = async () => {
-        const userId = user?.id || (user as any)?._id
+        const userId = user?._id || (user as User)?._id
         if (!userId) {
             toast.error("User ID not found. Please log in again.")
             return
@@ -277,9 +279,11 @@ const EditProfile = () => {
             ])
             toast.success('Profile updated successfully!')
             navigate('/profile')
-        } catch (error: any) {
-            console.error("Failed to save profile:", error)
-            toast.error(error.message || 'Failed to save profile. Please try again.')
+         } catch (error: unknown) {
+ 
+      const errorMessage = error instanceof Error ? error.message : "Internal server error";
+   console.log(errorMessage)
+   toast.error(errorMessage || 'Failed to save profile. Please try again.')
         } finally {
             setIsSaving(false)
         }
@@ -331,7 +335,7 @@ const EditProfile = () => {
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="hidden flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSaving ? 'Saving...' : 'Save Changes'}
                         </button>
@@ -389,8 +393,10 @@ const EditProfile = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
+                                <label
+                                    htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
                                 <input
+                                id='name'
                                     type="text"
                                     name="fullName"
                                     value={basicInfo.fullName}
@@ -398,9 +404,12 @@ const EditProfile = () => {
                                     className="w-full px-4 py-3 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Professional Role</label>
+                                <label
+                                    htmlFor="role" className="block text-sm font-medium text-neutral-700 mb-2">Professional Role</label>
                                 <input
+                                id="role"
                                     type="text"
                                     name="profRole"
                                     value={basicInfo.profRole}
@@ -409,8 +418,10 @@ const EditProfile = () => {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
+                                <label
+                                    htmlFor="location" className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
                                 <input
+                                id='location'
                                     type="text"
                                     name="location"
                                     value={basicInfo.location}
@@ -419,8 +430,10 @@ const EditProfile = () => {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
+                                <label     htmlFor="bio"
+                                className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
                                 <textarea
+                                id='bio'
                                     name="bio"
                                     value={basicInfo.bio}
                                     onChange={handleBasicInfoChange}

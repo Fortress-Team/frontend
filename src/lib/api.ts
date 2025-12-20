@@ -1,4 +1,6 @@
 import axios, { AxiosError } from "axios";
+// import { useAuthStore } from "../store/authStore";
+import type { User } from "../types";
 
 const api = axios.create({
   baseURL: "/api/v1",
@@ -22,11 +24,7 @@ api.interceptors.response.use(
 interface AuthResponse {
   message: string;
   status?: number;
-  user?: {
-    fullName: string;
-    email: string;
-    id: string;
-  };
+  user?: User
   token?: string;
 }
 
@@ -35,13 +33,13 @@ interface ApiError {
   errors?: string[];
 }
 
-interface RegisterUserProps {
+interface RegisterUser {
   fullName: string;
   email: string;
   password: string;
 }
 
-interface LoginUserProps {
+interface LoginUser {
   email: string;
   password: string;
 }
@@ -103,7 +101,7 @@ const handleError = (error: any, defaultMsg: string) => {
   return err.response?.data || { message: defaultMsg };
 };
 
-export const RegisterUser = async (payload: RegisterUserProps): Promise<AuthResponse> => {
+export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/register", payload);
     return response.data;
@@ -112,7 +110,9 @@ export const RegisterUser = async (payload: RegisterUserProps): Promise<AuthResp
   }
 };
 
-export const LoginUser = async (payload: LoginUserProps): Promise<AuthResponse> => {
+export const LoginUser = async (
+  payload: LoginUser
+): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/login", payload);
     return response.data;
@@ -125,8 +125,12 @@ export const VerifyOTP = async (otp: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/verify-otp", { OTP: otp });
     return response.data;
-  } catch (error) {
-    throw handleError(error, "OTP verification failed");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      // AxiosError type provides the `response` property
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
 
@@ -134,8 +138,8 @@ export const ResendOTP = async (email: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/resend-otp", { email });
     return response.data;
-  } catch (error) {
-    throw handleError(error, "Resend OTP failed");
+  } catch (error: any) {
+    throw error.response?.data || { message: "Server error" };
   }
 };
 
@@ -143,34 +147,45 @@ export const ForgotPassword = async (email: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/forgot-password", { email });
     return response.data;
-  } catch (error) {
-    throw handleError(error, "Forgot password request failed");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
+
 
 export const ResetPassword = async (payload: ResetPasswordProps): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/reset-password", payload);
     return response.data;
-  } catch (error) {
-    throw handleError(error, "Reset password failed");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || { message: "Server error" };
+    }
+    throw { message: "Server error" };
   }
 };
+
 
 // Educations
 export const getEducations = async (): Promise<Education[]> => {
   try {
     const response = await api.get("user/educations");
     return response.data.educations || response.data.data || response.data || [];
-  } catch (error) {
-    return [];
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.log(errorMessage);
+    return []; 
   }
 };
+
 
 export const addEducation = async (payload: Omit<Education, "_id">): Promise<Education> => {
   try {
     const response = await api.post("user/educations", payload);
-    let data = response.data.education || response.data.educations || response.data.data || response.data;
+    const data = response.data.education || response.data.educations || response.data.data || response.data;
     return Array.isArray(data) ? data[0] : data;
   } catch (error) {
     throw handleError(error, "Failed to add education");
@@ -199,15 +214,17 @@ export const getExperiences = async (): Promise<Experience[]> => {
   try {
     const response = await api.get("user/experiences");
     return response.data.experiences || response.data.data || response.data || [];
-  } catch (error) {
-    return [];
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.log(errorMessage);
+    return []; 
   }
 };
 
 export const addExperience = async (payload: Omit<Experience, "_id">): Promise<Experience> => {
   try {
     const response = await api.post("user/experiences", payload);
-    let data = response.data.experience || response.data.experiences || response.data.data || response.data;
+    const data = response.data.experience || response.data.experiences || response.data.data || response.data;
     return Array.isArray(data) ? data[0] : data;
   } catch (error) {
     throw handleError(error, "Failed to add experience");
@@ -236,15 +253,17 @@ export const getProjects = async (): Promise<Project[]> => {
   try {
     const response = await api.get("user/projects");
     return response.data.projects || response.data.data || response.data || [];
-  } catch (error) {
-    return [];
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.log(errorMessage);
+    return []; 
   }
 };
 
 export const addProject = async (project: Omit<Project, "_id">): Promise<Project> => {
   try {
     const response = await api.post("user/projects", project);
-    let data = response.data.projects || response.data.project || response.data.data || response.data;
+    const data = response.data.projects || response.data.project || response.data.data || response.data;
     return Array.isArray(data) ? data[0] : data;
   } catch (error) {
     throw handleError(error, "Failed to add project");
@@ -273,15 +292,17 @@ export const getSkills = async (): Promise<Skill[]> => {
   try {
     const response = await api.get("user/skills");
     return response.data.skills || response.data.data || response.data || [];
-  } catch (error) {
-    return [];
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.log(errorMessage);
+    return []; 
   }
-};
+  };
 
 export const addSkill = async (payload: Omit<Skill, "_id">): Promise<Skill> => {
   try {
     const response = await api.post("user/skills", payload);
-    let data = response.data.skills || response.data.skill || response.data.data || response.data;
+    const data = response.data.skills || response.data.skill || response.data.data || response.data;
     return Array.isArray(data) ? data[0] : data;
   } catch (error) {
     throw handleError(error, "Failed to add skill");
@@ -379,5 +400,7 @@ export const updateUserProfile = async (id: string, payload: Partial<UserProfile
     throw handleError(error, "Failed to update user profile");
   }
 };
+
+
 
 export default api;

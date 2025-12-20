@@ -7,6 +7,7 @@ import {
     getEducations, getExperiences, getProjects, getSkills, getUserLinks, getUserProfile
 } from '../../lib/api'
 import type { Education, Experience, Project, Skill, UserLinks, UserProfileData } from '../../lib/api'
+import type { User } from '../../types'
 
 const UserProfile = () => {
     const navigate = useNavigate()
@@ -45,7 +46,7 @@ const UserProfile = () => {
                 setSkills(skillData)
                 setLinks(linksData)
 
-                const userId = user?.id || (user as any)?._id
+                const userId = user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setProfile(profileData)
@@ -155,6 +156,7 @@ const UserProfile = () => {
                                 )}
                             </AnimatePresence>
                         </div>
+
                     </div>
                 </div>
             </nav>
@@ -207,7 +209,7 @@ const UserProfile = () => {
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">About</h3>
                         <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
-                            {profile?.bio || (isAuthenticated && (user?.id === profile?.id || (user as any)?._id === (profile as any)?._id) ? "No bio added yet. Tell us about yourself!" : "")}
+                            {profile?.bio || (isAuthenticated && (user?._id === profile?.id || (user as User)?._id === (profile as any)?._id) ? "No bio added yet. Tell us about yourself!" : "")}
                         </p>
 
                         <div className="mt-6 flex flex-wrap gap-4 text-neutral-400">

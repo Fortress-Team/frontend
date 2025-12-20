@@ -48,8 +48,8 @@ const VerifyOTP = () => {
         try {
             await verifyOTP(otp)
             navigate('/profile/edit')
-        } catch (error: any) {
-            setError(error.message || "OTP verification failed. Please try again.")
+        } catch (error: unknown) {
+            setError(error instanceof Error ? error.message : "OTP verification failed. Please try again.")
         } finally {
             setLoading(false)
         }
@@ -71,8 +71,8 @@ const VerifyOTP = () => {
             setResendTimer(300)
             setCanResend(false)
             setOtp("")
-        } catch (error: any) {
-            setError(error.message || 'Failed to resend code. Please try again.')
+        } catch (error: unknown) {
+            setError(error instanceof Error ? error.message : 'Failed to resend code. Please try again.')
         }
     }
 
