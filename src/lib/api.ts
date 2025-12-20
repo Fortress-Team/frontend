@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-// import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../store/authStore";
 import type { User } from "../types";
 
 const api = axios.create({
@@ -12,7 +12,13 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-    (config) => config,
+    (config) => {
+      const token = useAuthStore.getState().token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
     (error) => Promise.reject(error)
 );
 
