@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 import type { User } from "../types";
 
 const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: import.meta.env.MODE === "development" ? "/api/v1" : "https://fortress-backend-og7k.onrender.com/api/v1",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
