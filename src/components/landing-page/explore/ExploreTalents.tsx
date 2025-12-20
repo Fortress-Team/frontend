@@ -16,7 +16,7 @@ const ExploreTalents = () => {
 
 
     const {talents, fetchAllTalents, totalPage,loading, searchTalents} = useTalentStore()
- const { user, isAuthenticated, logout } = useAuthStore()
+ const { user, logout } = useAuthStore()
     const navigate = useNavigate()
   const [page,setPage] = useState<number>(1)
    const totalPages = totalPage ?? 1
@@ -89,11 +89,11 @@ const handleLogout = () => {
         navigate('/')
     }
 
-        useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/login')
-        }
-    }, [isAuthenticated, navigate])
+    //     useEffect(() => {
+    //     if (!isAuthenticated) {
+    //         navigate('/login')
+    //     }
+    // }, [isAuthenticated, navigate])
 
     return (
         <div className="min-h-screen bg-white text-neutral-900 font-sans">
@@ -122,7 +122,8 @@ const handleLogout = () => {
                                 </div>
                                 <ChevronDown
                                     size={18}
-                                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                    className={`text-neutral-400 group-hover:text-neutral-600 
+                                      transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
                                 />
                             </button>
 
