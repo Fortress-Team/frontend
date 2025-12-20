@@ -31,15 +31,9 @@ const SignUp = () => {
         setError('')
         setLoading(true)
         try {
-            console.log("[SignUp] Attempting registration with:", { ...formData, password: '***' })
             await register(formData.fullName, formData.email, formData.password)
-            console.log("[SignUp] Registration successful")
             navigate('/verify-otp')
         } catch (error: any) {
-            console.error("[SignUp] Registration CRITICAL ERROR:", error);
-            if (error.data) {
-                console.error("[SignUp] Raw Backend Data:", error.data);
-            }
             setError(error.message || "Registration failed. Please try again.")
         } finally {
             setLoading(false)
@@ -47,7 +41,6 @@ const SignUp = () => {
     }
 
     const handleSocialLogin = (provider: string) => {
-        // TODO: Implement social login when backend is ready
         alert(`${provider} login coming soon!`)
     }
 

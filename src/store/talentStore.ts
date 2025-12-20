@@ -38,7 +38,6 @@ export const useTalentStore = create<UserState>((set) => ({
   userProfile: async () => {
     set({ loading: true });
 
-console.log('API_URL:',API_URL)
     try {
       const response = await fetch(`${API_URL}/user/profile`, {
         method: "GET",

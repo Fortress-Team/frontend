@@ -131,12 +131,7 @@ export interface UserProfileData {
 
 const handleError = (error: any, defaultMsg: string) => {
   const err = error as AxiosError<ApiError>;
-  console.error(`[API Error] ${defaultMsg}:`, {
-    status: err.response?.status,
-    data: err.response?.data,
-    config: err.config?.url
-  });
-  // Return the full specialized object so we don't lose the 'errors' array
+  
   return err.response?.data || { message: defaultMsg };
 };
 
@@ -163,7 +158,7 @@ export const LoginUser = async (
   try {
     const response = await api.post("auth/login", payload);
     const data = response.data;
-    // Robust extraction for potentially nested data
+    
     const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
     const user = data.user || data.data?.user || data.data;
     return { ...data, token, user };
@@ -176,13 +171,13 @@ export const VerifyOTP = async (otp: string): Promise<AuthResponse> => {
   try {
     const response = await api.post("auth/verify-otp", { OTP: otp });
     const data = response.data;
-    // Robust extraction for potentially nested data
+   
     const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
     const user = data.user || data.data?.user || data.data;
     return { ...data, token, user };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      // AxiosError type provides the `response` property
+  
       throw error.response?.data || { message: "Server error" };
     }
     throw { message: "Server error" };

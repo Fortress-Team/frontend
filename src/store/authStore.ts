@@ -35,7 +35,6 @@ export const  useAuthStore = create<AuthState>()(
                         isAuthenticated : true
                     });
                 } catch (error : any) {
-                    console.error("[AuthStore] Login Error:", error);
                     const message = error?.message || error?.data?.message || "Login failed";
                     throw new Error(message);
                 }
@@ -49,11 +48,10 @@ export const  useAuthStore = create<AuthState>()(
                         isAuthenticated : true
                     });
                 } catch (error : any) {
-                    console.error("[AuthStore] Registration Error Detail:", error);
-                    // Pass the full error data along so the UI can use it
+                 
                     const message = error?.errors?.[0] || error?.message || "Registration failed";
                     const err = new Error(message) as any;
-                    err.data = error; // Attach raw data
+                    err.data = error;
                     throw err;
                 }
             },
