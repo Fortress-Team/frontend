@@ -24,6 +24,20 @@ interface CardProps {
 }
 
 const Card = ({ talent, index, getInitials }: CardProps) => {
+
+
+const formatTitle = (text?: string) => {
+  if (!text) return "Developer";
+
+  return text
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map(word => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+
   return (
     <motion.div
       key={talent._id}
@@ -40,7 +54,7 @@ const Card = ({ talent, index, getInitials }: CardProps) => {
           <h3 className="text-xl font-bold text-neutral-900 mb-1 group-hover:text-blue-600 transition-colors">
             {talent.fullName}
           </h3>
-          <p className="text-blue-600 text-sm font-semibold">{talent.profRole ?? 'Developer'}</p>
+          <p className="text-blue-600 text-sm font-semibold">  {formatTitle(talent.profRole)}</p>
         </div>
       </div>
 

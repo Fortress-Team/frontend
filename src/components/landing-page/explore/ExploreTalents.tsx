@@ -65,24 +65,22 @@ const getInitials = (name: string) =>
 
 
 
- const handleSearch = async () => {
-  if (!searchQuery.trim()) return; // do nothing if empty
+   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      searchTalents(searchQuery);
+      navigate(`/explore/${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
-  // Call the Zustand action
-  await searchTalents(searchQuery);
 
-  // Optionally update the URL
-  navigate(`/explore/${encodeURIComponent(searchQuery)}`);
-};
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim()) searchTalents(searchQuery);
+    }, 300); // 300ms delay
 
-useEffect(() => {
-  const delayDebounce = setTimeout(() => {
-    if (searchQuery.trim()) searchTalents(searchQuery);
-  }, 300); // debounce 300ms
-
-  return () => clearTimeout(delayDebounce);
-}, [searchQuery]);
-
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery, searchTalents]);
 
 const handleLogout = () => {
         logout()
@@ -239,8 +237,8 @@ const handleLogout = () => {
 
                     <form
   onSubmit={(e) => {
-    e.preventDefault(); // prevent page reload
-    handleSearch();      // call your search function
+    e.preventDefault(); 
+    handleSearch();      
   }}
   className="flex flex-col lg:flex-row gap-6 mb-12"
 >
@@ -259,14 +257,17 @@ const handleLogout = () => {
   </div>
 
   <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 lg:mx-0 lg:px-0 lg:overflow-visible no-scrollbar">
-    <div className="flex items-center gap-2 px-4 py-4 bg-neutral-50 border-2 border-neutral-200 rounded-2xl text-sm font-bold whitespace-nowrap">
+
+    <div className="hidden items-center gap-2 px-4 py-4 bg-neutral-50
+     border-2 border-neutral-200 rounded-2xl text-sm font-bold whitespace-nowrap">
       <Filter size={18} className="text-neutral-500" />
       <span>Filter</span>
     </div>
+
     <div className="flex gap-2">
       {ALL_SKILLS.slice(0, 5).map((skill) => (
         <button
-          type="button" // important so it doesn't submit the form
+          type="button" 
           key={skill}
           onClick={() => toggleSkill(skill)}
           className={`px-4 py-4 rounded-2xl border-2 text-sm font-bold transition-all whitespace-nowrap ${
