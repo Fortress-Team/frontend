@@ -18,13 +18,10 @@ api.interceptors.request.use(
       let token = null;
       try {
         const storageData = localStorage.getItem('auth-storage-v2');
-        console.log("Interceptor: Reading 'auth-storage-v2':", storageData); // DEBUG LOG
         if (storageData) {
           const { state } = JSON.parse(storageData);
-          console.log("Interceptor: Parsed state for token:", state); // DEBUG LOG
           if (state && state.token) {
             token = state.token;
-            console.log("Interceptor: Found token in storage:", token.substring(0, 10) + "..."); // DEBUG LOG
           }
         }
       } catch (e) {
@@ -34,12 +31,10 @@ api.interceptors.request.use(
       // 2. If no token in storage, try to get it from cookies
       if (!token) {
         try {
-            console.log("Interceptor: checking cookies:", document.cookie); // DEBUG LOG
             // Try identifying token by common names
             const match = document.cookie.match(new RegExp('(^| )(accessToken|access_token|token)=([^;]+)'));
             if (match) {
                 token = match[3];
-                console.log("Interceptor: Found token in cookie:", token.substring(0, 10) + "..."); // DEBUG LOG
             }
         } catch (e) {
             console.error("Error reading token from cookie", e);
@@ -48,9 +43,6 @@ api.interceptors.request.use(
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log("Interceptor: Attached Bearer token to header"); // DEBUG LOG
-      } else {
-        console.warn("Interceptor: No token found anywhere! withCredentials is TRUE, hoping backend accepts cookie."); // DEBUG LOG
       }
       
       return config;
@@ -162,11 +154,9 @@ export const LoginUser = async (
   try {
     const response = await api.post("auth/login", payload);
     const data = response.data;
-    console.log("Login Response Data:", data); // DEBUG LOG
     // Robust extraction for potentially nested data
     const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
     const user = data.user || data.data?.user || data.data;
-    console.log("Login Extracted Token:", token); // DEBUG LOG
     return { ...data, token, user };
   } catch (error) {
     throw handleError(error, "Login failed");
@@ -231,8 +221,6 @@ export const getEducations = async (): Promise<Education[]> => {
     const response = await api.get("user/educations");
     return response.data.educations || response.data.data || response.data || [];
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    console.log(errorMessage);
     return []; 
   }
 };
@@ -271,8 +259,6 @@ export const getExperiences = async (): Promise<Experience[]> => {
     const response = await api.get("user/experiences");
     return response.data.experiences || response.data.data || response.data || [];
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    console.log(errorMessage);
     return []; 
   }
 };
@@ -310,8 +296,6 @@ export const getProjects = async (): Promise<Project[]> => {
     const response = await api.get("user/projects");
     return response.data.projects || response.data.data || response.data || [];
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    console.log(errorMessage);
     return []; 
   }
 };
@@ -349,8 +333,6 @@ export const getSkills = async (): Promise<Skill[]> => {
     const response = await api.get("user/skills");
     return response.data.skills || response.data.data || response.data || [];
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Internal server error";
-    console.log(errorMessage);
     return []; 
   }
   };
