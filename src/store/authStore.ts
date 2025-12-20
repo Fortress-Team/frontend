@@ -49,8 +49,9 @@ export const  useAuthStore = create<AuthState>()(
                         isAuthenticated : true
                     });
                 } catch (error : any) {
-                    const message = error?.message || error?.data?.message || "Registration failed";
-                    throw new Error(message);
+                    // Extract the most specific error message possible
+                    const backendMsg = error?.errors?.[0] || error?.message || "Registration failed";
+                    throw new Error(backendMsg);
                 }
             },
             logout : () => {

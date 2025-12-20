@@ -138,8 +138,10 @@ export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse>
   try {
     const response = await api.post("auth/register", {
       ...payload,
-      name: payload.fullName, // Send both for backend compatibility
-      role: "Talent"         // Default role to avoid backend 500s
+      name: payload.fullName, // Support different backend naming
+      role: "Talent",         // Standard role
+      profRole: "Talent",     // Potential schema requirement
+      location: "Global"      // Potential schema requirement
     });
     const data = response.data;
     // Robust extraction for potentially nested data
