@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
-import { useAuthStore } from "../store/authStore";
+//  circular dependency
+// import { useAuthStore } from "../store/authStore";
 import type { User } from "../types";
 
 const api = axios.create({
@@ -12,9 +13,17 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-      const token = useAuthStore.getState().token;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      // Direct localStorage read to avoid circular dependency issues with authStore
+      try {
+        const storageData = localStorage.getItem('auth-storage');
+        if (storageData) {
+          const { state } = JSON.parse(storageData);
+          if (state && state.token) {
+            config.headers.Authorization = `Bearer ${state.token}`;
+          }
+        }
+      } catch (e) {
+        console.error("Error reading token from storage", e);
       }
       return config;
     },
