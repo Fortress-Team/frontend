@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Filter, X, Menu, Compass, ChevronDown, LogOut } from 'lucide-react'
+import { Search, Filter, X, Menu, Compass, ChevronDown, LogOut, UserIcon } from 'lucide-react'
 import { useTalentStore } from '../../../store/talentStore'
 import Pagination from './pagination'
 import Card from './card'
@@ -160,7 +160,7 @@ const handleLogout = () => {
                                             text-sm text-neutral-700 hover:bg-neutral-50
                                              hover:text-blue-600 transition-colors "
                                         >
-                                            <Compass size={18} />
+                                            <UserIcon size={18} />
                                             Profile
                                         </Link>
 
