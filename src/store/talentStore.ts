@@ -116,7 +116,7 @@ console.log('API_URL:',API_URL)
       const data = await response.json();
 
       if (response.ok) {
-        set({ talent: data, loading: false });
+        set({ talent: data.user, loading: false });
         return { success: true, user: data };
       } else {
         set({ loading: false, message: data?.message });
