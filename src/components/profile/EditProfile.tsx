@@ -611,7 +611,7 @@ const EditProfile = () => {
                                 <div key={exp._id} className="p-6 rounded-xl border-2 border-neutral-200 bg-white hover:border-neutral-300 transition-colors group relative">
                                     <button
                                         onClick={() => handleRemoveExperience(exp._id)}
-                                        className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm border border-neutral-200"
+                                        className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-red-600 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm border border-neutral-200"
                                         title="Remove Experience"
                                     >
                                         <Trash2 size={16} />
@@ -747,7 +747,7 @@ const EditProfile = () => {
                                 <div key={proj._id} className="p-6 rounded-xl border-2 border-neutral-200 bg-white hover:border-neutral-300 transition-colors group relative flex flex-col h-full">
                                     <button
                                         onClick={() => handleRemoveProject(proj._id)}
-                                        className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm border border-neutral-200"
+                                        className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-red-600 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm border border-neutral-200"
                                         title="Remove Project"
                                     >
                                         <Trash2 size={16} />
@@ -835,7 +835,7 @@ const EditProfile = () => {
                                 <div key={edu._id} className="p-6 rounded-xl border-2 border-neutral-200 bg-white hover:border-neutral-300 transition-colors group relative">
                                     <button
                                         onClick={() => handleRemoveEducation(edu._id)}
-                                        className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm border border-neutral-200"
+                                        className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-red-600 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm border border-neutral-200"
                                         title="Remove Education"
                                     >
                                         <Trash2 size={16} />
