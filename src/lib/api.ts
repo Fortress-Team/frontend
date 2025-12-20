@@ -14,17 +14,36 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
       // Direct localStorage read to avoid circular dependency issues with authStore
+      // 1. Try to get token from localStorage (Zustand)
+      let token = null;
       try {
         const storageData = localStorage.getItem('auth-storage-v2');
         if (storageData) {
           const { state } = JSON.parse(storageData);
           if (state && state.token) {
-            config.headers.Authorization = `Bearer ${state.token}`;
+            token = state.token;
           }
         }
       } catch (e) {
         console.error("Error reading token from storage", e);
       }
+
+      // 2. If no token in storage, try to get it from cookies
+      if (!token) {
+        try {
+            const match = document.cookie.match(new RegExp('(^| )accessToken=([^;]+)'));
+            if (match) {
+                token = match[2];
+            }
+        } catch (e) {
+            console.error("Error reading token from cookie", e);
+        }
+      }
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      
       return config;
     },
     (error) => Promise.reject(error)
