@@ -16,7 +16,7 @@ import EditSkills from './editSkills'
 import EditEducation from './editEducation'
 import EditExperience from './editExperience'
 
-const EditProfile = () => {
+const MockEditProfile = () => {
     const navigate = useNavigate()
     const { user, isAuthenticated, logout } = useAuthStore()
 
@@ -655,4 +655,4 @@ const EditProfile = () => {
     )
 }
 
-export default EditProfile
+export default MockEditProfile
