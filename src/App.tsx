@@ -20,7 +20,8 @@ import { Toaster } from 'sonner'
 import LoginCallback from './components/auth/loginCallback'
 import MockData from './components/profile/mockProfile'
 import SignUpCallback from './components/auth/SignupCallback'
-import MockEditProfile from './components/profile/mockEditProfile'
+
+import MocksEditProfile from './components/profile/mocksEditProfile'
 
 function App() {
   return (
@@ -40,7 +41,7 @@ function App() {
             <Route path="/profiles" element={<MockData />} />
         <Route path='/profile/:id'  element={<UserProfileDetails  />}  />
         <Route path="/profile/edit" element={<EditProfile />} />
-        <Route path="/profile/edit/mock" element={<MockEditProfile />} />
+        <Route path="/profile/edit/mock" element={<MocksEditProfile />} />
       </Routes>
 
     </Suspense>
