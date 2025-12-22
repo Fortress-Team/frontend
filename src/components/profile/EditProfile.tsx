@@ -19,11 +19,11 @@ const EditProfile = () => {
     const navigate = useNavigate()
     const { user, isAuthenticated, logout } = useAuthStore()
 
-    // useEffect(() => {
-    //     if (!isAuthenticated) {
-    //         navigate('/login')
-    //     }
-    // }, [isAuthenticated, navigate])
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login')
+        }
+    }, [isAuthenticated, navigate])
 
     const [basicInfo, setBasicInfo] = useState({
         fullName: user?.fullName || '',

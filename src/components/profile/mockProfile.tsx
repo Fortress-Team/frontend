@@ -1,46 +1,39 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useTalentStore } from "../../store/talentStore";
-import Loader from "../reuseable/loader";
-import { ChevronDown, Compass, LogOut, UserIcon } from "lucide-react";
-import { useAuthStore } from "../../store/authStore";
-import { AnimatePresence, motion } from "framer-motion";
-import type { Experience, Project, User } from "../../types";
-import type { Skill } from "../../types/skill.type";
+// import React from "react";
+
+import { mockUser } from "../../lib";
 import Footer from "../reuseable/footer";
 
 
+// Define Skill and Project types for TypeScript
+type Skill = {
+  _id: string;
+  title: string;
+  userId: string;
+};
 
-const UserProfileDetails = () => {
-  const { id } = useParams<{ id: string }>();
+type Project = {
+  _id: string;
+  title: string;
+  desc: string;
+  link?: string;
+  projectImg?: string;
+};
 
-  const { loading, fetchSingleTalent, talent } = useTalentStore();
+type Experience = {
+  _id: string;
+  title: string;
+  position: string;
+  date: string;
+  desc?: string;
+};
 
-  useEffect(() => {
-    if (!id) return;
-    fetchSingleTalent(id);
-  }, [id, fetchSingleTalent]);
-
-  if (loading) return <Loader />;
-
-  if (!talent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-neutral-500">
-        User not found
-      </div>
-    );
-  }
-
-  console.log('Talent details:', talent)
+const MockData = () => {
+  const talent = mockUser;
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20 gap-20">
       {/* Navbar */}
-
-      {/* i want to pass telent into nav */}
-      <Navs talent={talent} />
-
-
+      <MockNavs  />
 
       <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT COLUMN */}
@@ -111,6 +104,7 @@ const UserProfileDetails = () => {
                 </span>
               )}
             </div>
+
           </div>
 
           {/* SKILLS */}
@@ -119,19 +113,16 @@ const UserProfileDetails = () => {
 
             <div className="flex flex-wrap gap-2">
               {Array.isArray(talent.skills) &&
-                talent.skills.length > 0 &&
-                typeof talent.skills[0] !== "string" ? (
-                (talent.skills as Skill[]).map(
-                  (skill: Skill
-
-                  ) => (
-                    <span
-                      key={skill._id}
-                      className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 transition-colors cursor-default"
-                    >
-                      {skill.title ?? ''}
-                    </span>
-                  ))
+              talent.skills.length > 0 &&
+              typeof talent.skills[0] !== "string" ? (
+                (talent.skills as Skill[]).map((skill: Skill) => (
+                  <span
+                    key={skill._id}
+                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 transition-colors cursor-default"
+                  >
+                    {skill.title ?? ""}
+                  </span>
+                ))
               ) : (
                 <span className="text-sm text-neutral-400">
                   No skills added yet
@@ -154,46 +145,43 @@ const UserProfileDetails = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Array.isArray(talent.projects) &&
-                talent.projects.length > 0 &&
-                typeof talent.projects[0] !== "string" ? (
-                (talent.projects as Project[]).map(
-                  (project: Project
-
-                  ) => (
-                    <div
-                      key={project._id}
-                      className="group p-5 rounded-2xl bg-white border-2 border-neutral-200 hover:border-blue-300 transition-all hover:shadow-lg"
-                    >
-                      <div className="h-40 w-full rounded-xl bg-neutral-100 mb-4 overflow-hidden relative border border-neutral-200">
-                        {project.projectImg && (
-                          <img
-                            src={project.projectImg}
-                            alt={project.title}
-                            className="h-full w-full object-cover"
-                          />
-                        )}
-                      </div>
-
-                      <h4 className="text-lg font-bold mb-2 text-neutral-900 group-hover:text-blue-600 transition-colors">
-                        {project.title}
-                      </h4>
-
-                      <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
-                        {project.desc}
-                      </p>
-
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sm font-medium text-blue-600 hover:underline"
-                        >
-                          View Project →
-                        </a>
+              talent.projects.length > 0 &&
+              typeof talent.projects[0] !== "string" ? (
+                (talent.projects as Project[]).map((project: Project) => (
+                  <div
+                    key={project._id}
+                    className="group p-5 rounded-2xl bg-white border-2 border-neutral-200 hover:border-blue-300 transition-all hover:shadow-lg"
+                  >
+                    <div className="h-40 w-full rounded-xl bg-neutral-100 mb-4 overflow-hidden relative border border-neutral-200">
+                      {project.projectImg && (
+                        <img
+                          src={project.projectImg}
+                          alt={project.title}
+                          className="h-full w-full object-cover"
+                        />
                       )}
                     </div>
-                  ))
+
+                    <h4 className="text-lg font-bold mb-2 text-neutral-900 group-hover:text-blue-600 transition-colors">
+                      {project.title}
+                    </h4>
+
+                    <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
+                      {project.desc}
+                    </p>
+
+                    {project.link && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-medium text-blue-600 hover:underline"
+                      >
+                        View Project →
+                      </a>
+                    )}
+                  </div>
+                ))
               ) : (
                 <div className="text-neutral-400 text-sm">
                   No projects added yet
@@ -213,8 +201,8 @@ const UserProfileDetails = () => {
 
             <div className="space-y-6">
               {Array.isArray(talent.experiences) &&
-                talent.experiences.length > 0 &&
-                typeof talent.experiences[0] !== "string" ? (
+              talent.experiences.length > 0 &&
+              typeof talent.experiences[0] !== "string" ? (
                 (talent.experiences as Experience[]).map(
                   (exp: Experience) => (
                     <div
@@ -235,55 +223,46 @@ const UserProfileDetails = () => {
                       </div>
 
                       <p className="text-neutral-600 text-sm leading-relaxed">
-                        {exp.desc ?? ''}
+                        {exp.desc ?? ""}
                       </p>
                     </div>
-                  ))
+                  )
+                )
               ) : (
                 <div className="text-neutral-400 text-sm">
                   No experience added yet
                 </div>
               )}
             </div>
-
           </div>
-
-
         </div>
       </div>
 
       <div className="mt-10">
         <Footer />
       </div>
-
     </div>
   );
 };
 
-export default UserProfileDetails;
+export default MockData;
 
 
 
 
+import { Link} from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, UserIcon, Compass, LogOut } from "lucide-react";
 
 
+import { useEffect, useRef, useState } from "react";
+import Loader from "../reuseable/loader";
 
 
-type NavsProps = {
-  talent: User;
-};
-
-const Navs = ({ talent }: NavsProps) => {
-  const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+const MockNavs = () => {
+  const talent = mockUser; // use mock user directly
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   if (!isAuthenticated) {
-  //     navigate("/login");
-  //   }
-  // }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -295,9 +274,10 @@ const Navs = ({ talent }: NavsProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Mock logout just closes dropdown for demo
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    setIsDropdownOpen(false);
+    alert("Logged out (mock)");
   };
 
   if (!talent) {
@@ -337,79 +317,67 @@ const Navs = ({ talent }: NavsProps) => {
             </Link>
 
             {/* PROFILE DROPDOWN */}
-            {!user ? (
-              <Link
-                to="/login"
-                className="px-5 py-2.5 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors"
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
               >
-                Log In
-              </Link>
-            ) : (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
-                >
-                  <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
-                    {user.fullName.charAt(0).toUpperCase()}
-                  </div>
-                  <ChevronDown
-                    size={18}
-                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
-                      }`}
-                  />
-                </button>
+                <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
+                  {talent.fullName.charAt(0).toUpperCase()}
+                </div>
+                <ChevronDown
+                  size={18}
+                  className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
-                <AnimatePresence>
-                  {isDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-neutral-100 mb-2">
+                      <p className="text-sm font-bold text-neutral-900 truncate">
+                        {talent.fullName}
+                      </p>
+                      <p className="text-xs text-neutral-500 truncate">{talent.email}</p>
+                    </div>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors"
                     >
-                      <div className="px-4 py-3 border-b border-neutral-100 mb-2">
-                        <p className="text-sm font-bold text-neutral-900 truncate">
-                          {user.fullName}
-                        </p>
-                        <p className="text-xs text-neutral-500 truncate">
-                          {user.email}
-                        </p>
-                      </div>
+                      <UserIcon size={18} />
+                      Profile
+                    </Link>
 
-                      <Link
-                        to="/profile"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 
-                                            text-sm text-neutral-700 hover:bg-neutral-50
-                                             hover:text-blue-600 transition-colors "
-                      >
-                        <UserIcon size={18} />
-                        Profile
-                      </Link>
+                    <Link
+                      to="/explore"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors md:hidden"
+                    >
+                      <Compass size={18} />
+                      Explore
+                    </Link>
 
-                      <Link
-                        to="/explore"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors md:hidden"
-                      >
-                        <Compass size={18} />
-                        Explore
-                      </Link>
-
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
-                      >
-                        <LogOut size={18} />
-                        Logout
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </nav>
@@ -438,16 +406,14 @@ const Navs = ({ talent }: NavsProps) => {
               <h1 className="text-4xl font-bold text-neutral-900 mb-1">
                 {talent.fullName}
               </h1>
-              <p className="text-neutral-700 font-medium text-lg">
-                {talent.profRole || ""}
-              </p>
+              <p className="text-neutral-700 font-medium text-lg">{talent.profRole || ""}</p>
               <p className="text-neutral-500 text-sm">
                 {talent.email} • Joined{" "}
                 {talent.createdAt
                   ? new Date(talent.createdAt).toLocaleDateString("en", {
-                    month: "short",
-                    year: "numeric",
-                  })
+                      month: "short",
+                      year: "numeric",
+                    })
                   : ""}
               </p>
             </div>
@@ -457,7 +423,5 @@ const Navs = ({ talent }: NavsProps) => {
     </>
   );
 };
-
-
 
 

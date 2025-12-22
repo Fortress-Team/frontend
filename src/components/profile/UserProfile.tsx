@@ -33,11 +33,11 @@ const { user, isAuthenticated, logout } = useAuthStore();
     const [profile, setProfile] = useState<UserProfileData | null>(null)
     const [loading, setLoading] = useState(true)
 
-    // useEffect(() => {
-    //     if (!isAuthenticated) {
-    //         navigate('/login')
-    //     }
-    // }, [isAuthenticated, navigate])
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login')
+        }
+    }, [isAuthenticated, navigate])
 
 
     const currentUser = clerkUser || user;
