@@ -93,7 +93,7 @@ const EditProfile = () => {
                 setSkills(skillData)
                 setSocialLinks(linksData)
 
-                const userId = (user as any)?.id || user?._id || (user as User)?._id
+                const userId = (user as User)?._id || user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setBasicInfo({
@@ -857,6 +857,7 @@ const EditProfile = () => {
                             </div>
                         )}
                     </section>
+
                     {/* Education */}
                     <section className="p-8 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <div className="flex justify-between items-center mb-6 border-b border-neutral-200 pb-4">
@@ -945,7 +946,9 @@ const EditProfile = () => {
                                 <p className="text-center text-neutral-400 py-8 italic">No education info added yet.</p>
                             )}
                         </div>
+
                     </section>
+
                 </div>
             </div >
         </div >

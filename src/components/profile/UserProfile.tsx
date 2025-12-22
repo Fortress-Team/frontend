@@ -45,6 +45,7 @@ const { user, isAuthenticated, logout } = useAuthStore();
     console.log("Clerk user:", clerkUser?.firstName);
 console.log("Store user:", user?.email);
    console.log("Current user:", clerkUser?.firstName);
+   console.log('Current user:', currentUser)
 
 
     
