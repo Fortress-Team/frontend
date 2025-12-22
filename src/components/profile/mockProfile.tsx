@@ -27,6 +27,13 @@ type Experience = {
   desc?: string;
 };
 
+export type Link = {
+  github?: string;
+  linkedin?: string;
+  X?: string;       
+  portfolio?: string;
+};
+
 const MockData = () => {
   const talent = mockUser;
 
@@ -51,7 +58,7 @@ const MockData = () => {
             {/* LINKS */}
             <div className="mt-6 flex flex-wrap gap-4 text-neutral-600">
               {talent.links && talent.links.length > 0 ? (
-                talent.links.map((link, index) => (
+                talent.links.map((link:Link, index) => (
                   <div key={index} className="flex gap-4 flex-wrap">
                     {link.github && (
                       <a
