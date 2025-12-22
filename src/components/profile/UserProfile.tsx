@@ -9,10 +9,19 @@ import {
 import type { Education, Experience, Project, Skill, UserLinks, UserProfileData } from '../../lib/api'
 import type { User } from '../../types'
 import Loader from '../reuseable/loader'
+import { useUser } from '@clerk/clerk-react'
 
 const UserProfile = () => {
     const navigate = useNavigate()
-    const { user, isAuthenticated, logout } = useAuthStore()
+
+
+const { user: clerkUser } = useUser();
+
+
+const { user, isAuthenticated, logout } = useAuthStore();
+
+
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -24,11 +33,22 @@ const UserProfile = () => {
     const [profile, setProfile] = useState<UserProfileData | null>(null)
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/login')
-        }
-    }, [isAuthenticated, navigate])
+    // useEffect(() => {
+    //     if (!isAuthenticated) {
+    //         navigate('/login')
+    //     }
+    // }, [isAuthenticated, navigate])
+
+
+    const currentUser = clerkUser || user;
+
+    console.log("Clerk user:", clerkUser?.firstName);
+console.log("Store user:", user?.email);
+   console.log("Current user:", clerkUser?.firstName);
+
+
+    
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -47,7 +67,7 @@ const UserProfile = () => {
                 setSkills(skillData)
                 setLinks(linksData)
 
-                const userId = (user as any)?.id || user?._id || (user as User)?._id
+                const userId = (user as User)?._id || user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setProfile(profileData)
@@ -214,7 +234,7 @@ const UserProfile = () => {
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">About</h3>
                         <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
-                            {profile?.bio || (isAuthenticated && ((user as any)?.id === profile?.id || user?._id === profile?.id || (user as any)?.id === (profile as any)?.id) ? "No bio added yet. Tell us about yourself!" : "")}
+                            {profile?.bio || (isAuthenticated && ((user as User)?._id === profile?.id || user?._id === profile?.id || (user as User)?._id === (profile as any)?.id) ? "No bio added yet. Tell us about yourself!" : "")}
                         </p>
 
                         <div className="mt-6 flex flex-wrap gap-4 text-neutral-400">

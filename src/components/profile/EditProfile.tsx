@@ -19,11 +19,11 @@ const EditProfile = () => {
     const navigate = useNavigate()
     const { user, isAuthenticated, logout } = useAuthStore()
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/login')
-        }
-    }, [isAuthenticated, navigate])
+    // useEffect(() => {
+    //     if (!isAuthenticated) {
+    //         navigate('/login')
+    //     }
+    // }, [isAuthenticated, navigate])
 
     const [basicInfo, setBasicInfo] = useState({
         fullName: user?.fullName || '',
@@ -273,7 +273,7 @@ const EditProfile = () => {
     const [isSaving, setIsSaving] = useState(false)
 
     const handleSave = async () => {
-        const userId = (user as any)?.id || user?._id || (user as User)?._id
+        const userId = (user as User)?._id || user?._id || (user as User)?._id
         if (!userId) {
             toast.error("User ID not found. Please log in again.")
             return

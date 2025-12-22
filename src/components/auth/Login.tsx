@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
 import { Eye, EyeOff } from 'lucide-react'
+import { useSignIn } from '@clerk/clerk-react'
+import Loader from '../reuseable/loader'
 
 
 const Login = () => {
@@ -28,10 +30,27 @@ const Login = () => {
         }
     }
 
-    const handleSocialLogin = (provider: string) => {
-        // TODO: Implement social login when backend is ready
-        alert(`${provider} login coming soon!`)
-    }
+    // const handleSocialLogin = (provider: string) => {
+    //     // TODO: Implement social login when backend is ready
+    //     alert(`${provider} login coming soon!`)
+    // }
+
+
+
+const { signIn, isLoaded } = useSignIn();
+
+if (!isLoaded) return <Loader />; 
+if (!signIn) return null
+
+const signInWithGoogle = () => {
+  if (!signIn) return;
+
+  signIn.authenticateWithRedirect({
+    strategy: "oauth_google",
+    redirectUrl: "/login/sso-callback",
+    redirectUrlComplete: "/profile",
+  });
+};
 
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
@@ -57,8 +76,9 @@ const Login = () => {
                 <div className="space-y-3 mb-8">
                     <button
                         type="button"
-                        onClick={() => handleSocialLogin('Google')}
-                        className="w-full px-6 py-3.5 bg-white border-2 border-neutral-200 rounded-xl text-neutral-700 font-medium hover:border-neutral-300 hover:bg-neutral-50 transition-all flex items-center justify-center gap-3"
+                     onClick={signInWithGoogle}
+                        className="w-full px-6 py-3.5 bg-white border-2 border-neutral-200  cursor-pointer
+                        rounded-xl text-neutral-700 font-medium hover:border-neutral-300 hover:bg-neutral-50 transition-all flex items-center justify-center gap-3"
                     >
                         <FcGoogle className="w-5 h-5" />
                         Continue with Google

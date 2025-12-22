@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
 import { Eye, EyeOff } from 'lucide-react'
+import { useSignUp } from '@clerk/clerk-react'
 
 
 const SignUp = () => {
@@ -40,10 +41,23 @@ const SignUp = () => {
         }
     }
 
-    const handleSocialLogin = (provider: string) => {
-        alert(`${provider} login coming soon!`)
-    }
+    // const handleSocialLogin = (provider: string) => {
+    //     alert(`${provider} login coming soon!`)
+    // }
 
+
+      const { signUp } = useSignUp();
+
+  const signUpWithGoogle = () => {
+    if (!signUp) return; 
+    signUp.authenticateWithRedirect({
+      strategy: "oauth_google",
+      redirectUrl: "/sign-up/sso-callback",
+      redirectUrlComplete: "/profile",
+    });
+  };
+
+  
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
             <div className="max-w-2xl w-full">
@@ -65,12 +79,14 @@ const SignUp = () => {
                     </p>
                 </div>
 
-
-                <div className="space-y-3 mb-8">
+<div id="clerk-captcha"></div>
+                <div 
+                 className="space-y-3 mb-8">
                     <button
                         type="button"
-                        onClick={() => handleSocialLogin('Google')}
-                        className="w-full px-6 py-3 md:py-3.5 bg-white border-2 border-neutral-200 rounded-xl text-neutral-700 font-medium hover:border-neutral-300 hover:bg-neutral-50 transition-all flex items-center justify-center gap-3"
+                        onClick={signUpWithGoogle}
+                        className="w-full px-6 py-3 md:py-3.5 bg-white border-2 cursor-pointer
+                         border-neutral-200 rounded-xl text-neutral-700 font-medium hover:border-neutral-300 hover:bg-neutral-50 transition-all flex items-center justify-center gap-3"
                     >
                         <FcGoogle className="w-5 h-5" />
                         Continue with Google

@@ -16,6 +16,8 @@ const EditProfile = lazy(() => import('./components/profile/EditProfile'))
 const ExploreTalents = lazy(() => import('./components/landing-page/explore/index'))
 
 import { Toaster } from 'sonner'
+import SignUpCallback from './components/auth/signupCallback'
+import LoginCallback from './components/auth/loginCallback'
 
 function App() {
   return (
@@ -25,7 +27,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/explore" element={<ExploreTalents />} />
         <Route path="/login" element={<Login />} />
+          <Route path="/login/sso-callback" element={<LoginCallback />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/sign-up/sso-callback" element={<SignUpCallback />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

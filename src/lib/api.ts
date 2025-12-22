@@ -3,6 +3,9 @@ import axios, { AxiosError } from "axios";
 // import { useAuthStore } from "../store/authStore";
 import type { User } from "../types";
 
+
+
+
 const api = axios.create({
   baseURL: "/api/v1",
   withCredentials: true, // Re-enabled to send cookies if they are HttpOnly
@@ -142,6 +145,7 @@ export const RegisterUser = async (payload: RegisterUser): Promise<AuthResponse>
       email: payload.email,
       password: payload.password
     });
+
     const data = response.data;
     // Robust extraction for potentially nested data
     const token = data.token || data.data?.token || data.accessToken || data.data?.accessToken;
