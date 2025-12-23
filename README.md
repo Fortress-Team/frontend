@@ -95,14 +95,6 @@ pnpm install
 npm install
 
 
-Set environment variables in .env
-
-VITE_API_URL=https://your-backend-url.com
-VITE_CLOUDINARY_CLOUD_NAME=your-cloud-name
-VITE_CLOUDINARY_API_KEY=your-api-key
-VITE_CLOUDINARY_UPLOAD_PRESET=your-upload-preset
-
-
 Run the development server
 
 pnpm dev
