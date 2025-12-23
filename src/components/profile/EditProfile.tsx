@@ -236,7 +236,7 @@ const EditProfile = () => {
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link to="/" className="text-2xl font-bold flex items-center gap-2 text-blue-600">
                         <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                        SpotLight
+                        SPOTLIGHT
                     </Link>
                     <div className="flex gap-4 items-center">
                         <button
