@@ -18,10 +18,9 @@ const ExploreTalents = lazy(() => import('./components/landing-page/explore/inde
 import { Toaster } from 'sonner'
 
 import LoginCallback from './components/auth/loginCallback'
-import MockData from './components/profile/mockProfile'
 import SignUpCallback from './components/auth/SignupCallback'
 
-import MocksEditProfile from './components/profile/mocksEditProfile'
+
 
 function App() {
   return (
@@ -38,10 +37,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<UserProfile />} />
-            <Route path="/profiles" element={<MockData />} />
+     
         <Route path='/profile/:id'  element={<UserProfileDetails  />}  />
         <Route path="/profile/edit" element={<EditProfile />} />
-        <Route path="/profile/edit/mock" element={<MocksEditProfile />} />
+      
       </Routes>
 
     </Suspense>

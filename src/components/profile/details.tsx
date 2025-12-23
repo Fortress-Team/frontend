@@ -31,7 +31,7 @@ const UserProfileDetails = () => {
     );
   }
 
-  console.log('Talent details:', talent)
+  // console.log('Talent details:', talent)
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20 gap-20">

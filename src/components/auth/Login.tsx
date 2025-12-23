@@ -59,7 +59,7 @@ const signInWithGoogle = () => {
                 <Link to="/" className="inline-block mb-12">
                     <div className="text-3xl font-bold text-blue-600 flex items-center gap-2">
                         <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                        SpotLight
+                        SPOTLIGHT
                     </div>
                 </Link>
 
