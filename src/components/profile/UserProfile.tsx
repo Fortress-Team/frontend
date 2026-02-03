@@ -3,7 +3,7 @@ import { useAuthStore } from '../../store/authStore'
 import { useEffect, useState, useRef } from 'react'
 import { ChevronDown, LogOut, Compass, GraduationCap, Github, Linkedin, Twitter, Globe, Loader2, SparkleIcon, Link2Icon, PenBox } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
+import api, {
     getEducations, getExperiences, getProjects, getSkills, getUserLinks, getUserProfile
 } from '../../lib/api'
 import type { Education, Experience, Project, Skill, UserLinks, UserProfileData } from '../../lib/api'
@@ -11,7 +11,7 @@ import type { User } from '../../types'
 import Loader from '../reuseable/loader'
 import { useUser } from '@clerk/clerk-react'
 import { toast } from 'sonner'
-import axios from 'axios'
+// import axios from 'axios'
 import ProfileReviewModal from './reviewModal'
 
 const UserProfile = () => {
@@ -50,7 +50,7 @@ const { user:appUser, isAuthenticated, logout } = useAuthStore();
     // console.log("Clerk user:", clerkUser?.firstName);
 // console.log("Store user:", user?.email);
 //    console.log("Current user:", clerkUser?.firstName);
-   console.log('Current user:', user)
+//    console.log('Current user:', user)
 
 
     
@@ -129,9 +129,9 @@ const handleShareProfile = async () => {
   const userId = ("_id" in user ? user._id : user?.id) || "";
   if (!userId) return;
 
-  setIsLoading(true); // or setIsSharing(true)
+  setIsLoading(true); 
   try {
-    const res = await axios.get<{ message: string; link: string }>(`/api/users/share/${userId}`);
+    const res = await api.get<{ message: string; link: string }>(`/users/share/${userId}`);
     const link = res.data.link;
 
     if (!link) throw new Error("No link returned from server");
@@ -150,13 +150,13 @@ const handleShareProfile = async () => {
 
   const userId = ("_id" in user ? user._id : user?.id) || "";
 const handleOpenReviewModal = () => {
-  setReviewLoading(true); // show loading first
+  setReviewLoading(true); 
 
-  // small delay to simulate processing before opening modal
+
   setTimeout(() => {
-    setReviewLoading(false);      // hide spinner
-    setIsReviewModalOpen(true);   // open modal
-  }, 300); // 300ms is usually enough for a small “flash”
+    setReviewLoading(false);      
+    setIsReviewModalOpen(true);   
+  }, 300); 
 };
 
 
@@ -253,7 +253,7 @@ const handleOpenReviewModal = () => {
                         </div>
                         <div className="mb-4 md:mb-1 flex-1 text-center md:text-left">
                             <h1 className="text-4xl font-bold text-neutral-900 mb-1">{profile?.fullName || user.fullName}</h1>
-                            {profile?.profRole && <p className="text-neutral-700 font-medium text-lg">{profile.profRole}</p>}
+                            {profile?.profRole && <p className="hidden text-neutral-700 font-medium text-lg">{profile.profRole}</p>}
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1">
                                 <p className="text-neutral-500 text-sm">{profile?.email || ("email" in user ? user.email : clerkUser?.primaryEmailAddress?.emailAddress) || ''}</p>
                                 {profile?.location && (

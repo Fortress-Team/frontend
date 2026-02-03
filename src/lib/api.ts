@@ -6,7 +6,7 @@ import type { User } from "../types";
 
 
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: "/api/v1",
   withCredentials: true, // Re-enabled to send cookies if they are HttpOnly
   headers: {
@@ -17,7 +17,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-      // 1. Try to get token from localStorage (Zustand)
+
       let token = null;
       try {
         const storageData = localStorage.getItem('auth-storage-v2');
@@ -31,7 +31,7 @@ api.interceptors.request.use(
         console.error("Error reading token from storage", e);
       }
 
-      // 2. If no token in storage, try to get it from cookies
+
       if (!token) {
         try {
             const match = document.cookie.match(new RegExp('(^| )(accessToken|access_token|token)=([^;]+)'));

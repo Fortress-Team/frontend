@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-hot-toast";
-import axios from "axios";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { api } from "../../lib";
 
 interface ReviewData {
   score: number;
@@ -19,15 +19,15 @@ interface ProfileReviewModalProps {
 const ProfileReviewModal: React.FC<ProfileReviewModalProps> = ({ isOpen, onClose, userId }) => {
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState<ReviewData | null>(null);
-  const [hasFetched, setHasFetched] = useState(false); // track if we attempted to fetch
+  const [hasFetched, setHasFetched] = useState(false); 
 
 const handleReview = React.useCallback(async () => {
   if (!userId) return;
 
   setLoading(true);
   try {
-    const res = await axios.post<{ message: string; data: ReviewData | null }>(
-      `/api/users/rate`,
+    const res = await api.post<{ message: string; data: ReviewData | null }>(
+      `/api/v1/ai/review`,
       { userId }
     );
 
