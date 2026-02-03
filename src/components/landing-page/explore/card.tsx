@@ -54,7 +54,7 @@ const formatTitle = (text?: string) => {
           <h3 className="text-xl font-bold text-neutral-900 mb-1 group-hover:text-blue-600 transition-colors">
             {formatTitle(talent.fullName)}
           </h3>
-          <p className="text-blue-600 text-sm font-semibold">  {formatTitle(talent.profRole)}</p>
+          <p className="text-blue-600 text-sm font-semibold">  {formatTitle(talent?.profRole)}</p>
         </div>
       </div>
 

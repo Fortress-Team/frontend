@@ -9,7 +9,7 @@ import api, {
 import type { Education, Experience, Project, Skill, UserLinks, UserProfileData } from '../../lib/api'
 import type { User } from '../../types'
 import Loader from '../reuseable/loader'
-import { useUser } from '@clerk/clerk-react'
+import {  useUser } from '@clerk/clerk-react'
 import { toast } from 'sonner'
 // import axios from 'axios'
 import ProfileReviewModal from './reviewModal'
@@ -38,11 +38,14 @@ const { user:appUser, isAuthenticated, logout } = useAuthStore();
     const [profile, setProfile] = useState<UserProfileData | null>(null)
     const [loading, setLoading] = useState(true)
 
+
+
+
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!isAuthenticated || !isSignedIn) {
             navigate('/login')
         }
-    }, [isAuthenticated, navigate])
+    }, [isAuthenticated,isSignedIn, navigate])
 
 
     const user = isSignedIn ?  clerkUser : appUser;

@@ -17,9 +17,9 @@ const ExploreTalents = lazy(() => import('./components/landing-page/explore/inde
 
 import { Toaster } from 'sonner'
 
-import LoginCallback from './components/auth/loginCallback'
-import SignUpCallback from './components/auth/SignupCallback'
 
+import SignUpCallback from './components/auth/SignupCallback'
+import SSOCallback from './components/auth/SsoCallback'
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/explore" element={<ExploreTalents />} />
         <Route path="/login" element={<Login />} />
-          <Route path="/sso-callback" element={<LoginCallback />} />
+          <Route path="/sso-callback" element={<SSOCallback />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/sign-up/sso-callback" element={<SignUpCallback />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />

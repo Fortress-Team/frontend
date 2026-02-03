@@ -350,7 +350,7 @@ const handleLogout = () => {
 </div>
 
 
-                    {filteredTalents.length === 0 && (
+                    {filteredTalents.length === 0 && !loading && (
                         <div className="text-center py-20 bg-neutral-50 rounded-3xl border-2 border-dashed border-neutral-200">
                             <div className="text-neutral-400 mb-4">No talents found matching your criteria.</div>
                             <button
@@ -366,14 +366,14 @@ const handleLogout = () => {
 
                     {/* Pagination */}
 
-                    <div>
+            {!loading &&        <div>
                         <Pagination       
                    currentPage={page}
                     totalPages={totalPages}
                     onPageChange={ (newPage) => setPage(newPage)}
 
 />
-                    </div>
+                    </div>}
                 </div>
 
 

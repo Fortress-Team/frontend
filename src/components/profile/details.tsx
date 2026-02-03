@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTalentStore } from "../../store/talentStore";
 import Loader from "../reuseable/loader";
-import { ChevronDown, Compass, LogOut, UserIcon } from "lucide-react";
+import { ChevronDown, Compass, Github, Globe, Linkedin, LogOut, Twitter, UserIcon } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Experience, Project, User } from "../../types";
@@ -31,7 +31,9 @@ const UserProfileDetails = () => {
     );
   }
 
-  // console.log('Talent details:', talent)
+  console.log('Talent details:', talent)
+
+
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20 gap-20">
@@ -67,7 +69,7 @@ const UserProfileDetails = () => {
                         rel="noreferrer"
                         className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium"
                       >
-                        Github
+                     <Github size={18} />
                       </a>
                     )}
 
@@ -78,7 +80,7 @@ const UserProfileDetails = () => {
                         rel="noreferrer"
                         className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium"
                       >
-                        LinkedIn
+                         <Linkedin size={18} />
                       </a>
                     )}
 
@@ -89,7 +91,7 @@ const UserProfileDetails = () => {
                         rel="noreferrer"
                         className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium"
                       >
-                        Twitter
+                           <Twitter size={18} />
                       </a>
                     )}
 
@@ -100,7 +102,7 @@ const UserProfileDetails = () => {
                         rel="noreferrer"
                         className="hover:text-blue-600 transition-colors flex items-center gap-2 text-sm font-medium"
                       >
-                        Portfolio
+                      <Globe size={18} />
                       </a>
                     )}
                   </div>
@@ -111,6 +113,9 @@ const UserProfileDetails = () => {
                 </span>
               )}
             </div>
+
+
+            
           </div>
 
           {/* SKILLS */}
@@ -300,6 +305,18 @@ const Navs = ({ talent }: NavsProps) => {
     navigate("/");
   };
 
+
+    const formatTitle = (text?: string) => {
+  if (!text) return "Developer";
+
+  return text
+    .split(" ")
+    .filter(Boolean) 
+    .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
+
+
   if (!talent) {
     return (
       <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center">
@@ -371,7 +388,7 @@ const Navs = ({ talent }: NavsProps) => {
                     >
                       <div className="px-4 py-3 border-b border-neutral-100 mb-2">
                         <p className="text-sm font-bold text-neutral-900 truncate">
-                          {user.fullName}
+                          {formatTitle(user.fullName)}
                         </p>
                         <p className="text-xs text-neutral-500 truncate">
                           {user.email}
@@ -436,7 +453,7 @@ const Navs = ({ talent }: NavsProps) => {
 
             <div className="mb-4 md:mb-1 flex-1 text-center md:text-left">
               <h1 className="text-4xl font-bold text-neutral-900 mb-1">
-                {talent.fullName}
+                {formatTitle(talent.fullName)}
               </h1>
               <p className="text-neutral-700 font-medium text-lg">
                 {talent.profRole || ""}
