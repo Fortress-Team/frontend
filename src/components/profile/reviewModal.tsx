@@ -27,7 +27,7 @@ const handleReview = React.useCallback(async () => {
   setLoading(true);
   try {
     const res = await api.post<{ message: string; data: ReviewData | null }>(
-      `/api/v1/ai/review`,
+      `/ai/review`,
       { userId }
     );
 
