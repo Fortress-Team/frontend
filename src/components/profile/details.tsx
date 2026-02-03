@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Experience, Project, User } from "../../types";
 import type { Skill } from "../../types/skill.type";
 import Footer from "../reuseable/footer";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
 
 
@@ -280,7 +281,8 @@ type NavsProps = {
 
 const Navs = ({ talent }: NavsProps) => {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user: appUser , logout } = useAuthStore();
+  const {isSignedIn, user:clerkUser} = useUser()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -300,10 +302,34 @@ const Navs = ({ talent }: NavsProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+
+    const user = isSignedIn ? clerkUser : appUser
+
+  const {signOut} = useClerk()
+
+    const handleLogout = async() => {
+
+
+          if (isSignedIn) {
+      await signOut();
+              setIsDropdownOpen(false)
+        navigate('/')
+    } else {
+       await  logout()
+        setIsDropdownOpen(false)
+        navigate('/')
+    }}
+
+        const displayUser = isSignedIn
+  ? {
+      fullName: clerkUser?.fullName ?? "",
+      email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? "",
+    }
+  : {
+      fullName: appUser?.fullName ?? "",
+      email: appUser?.email ?? "",
+    };
+
 
 
     const formatTitle = (text?: string) => {
@@ -368,7 +394,7 @@ const Navs = ({ talent }: NavsProps) => {
                   className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
                 >
                   <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
-                    {user.fullName.charAt(0).toUpperCase()}
+                    {displayUser?.fullName.charAt(0).toUpperCase()}
                   </div>
                   <ChevronDown
                     size={18}
@@ -388,10 +414,10 @@ const Navs = ({ talent }: NavsProps) => {
                     >
                       <div className="px-4 py-3 border-b border-neutral-100 mb-2">
                         <p className="text-sm font-bold text-neutral-900 truncate">
-                          {formatTitle(user.fullName)}
+                          {formatTitle(displayUser?.fullName)}
                         </p>
                         <p className="text-xs text-neutral-500 truncate">
-                          {user.email}
+                          {displayUser?.email}
                         </p>
                       </div>
 
@@ -417,7 +443,9 @@ const Navs = ({ talent }: NavsProps) => {
 
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm
+                         text-red-600 hover:bg-red-50 transition-colors mt-2 border-t
+                          border-neutral-100 pt-3"
                       >
                         <LogOut size={18} />
                         Logout

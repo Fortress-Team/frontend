@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
 import { Eye, EyeOff } from 'lucide-react'
-import { useSignIn } from '@clerk/clerk-react'
-import Loader from '../reuseable/loader'
+import { useSignIn, useUser } from '@clerk/clerk-react'
+// import Loader from '../reuseable/loader'
 
 
 const Login = () => {
@@ -38,12 +38,14 @@ const Login = () => {
 
 
 const { signIn, isLoaded } = useSignIn();
+const {isSignedIn} = useUser()
 
-if (!isLoaded) return <Loader />; 
-if (!signIn) return null
+// if (!isLoaded) return <Loader />; 
+// if (!signIn) return null
 
 const signInWithGoogle = async() => {
-  if (!signIn) return;
+    console.log('Cliced')
+  if (!isSignedIn || !isLoaded) return;
 
    await signIn.authenticateWithRedirect({
     strategy: 'oauth_google',

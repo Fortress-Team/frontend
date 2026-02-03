@@ -3,13 +3,22 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
+import { useClerk, useUser } from '@clerk/clerk-react'
+
 
 const Header = () => {
     const navigate = useNavigate()
-    const { user, isAuthenticated, logout } = useAuthStore()
+
+    // form user
+    const { user: appUser, isAuthenticated, logout } = useAuthStore()
+    // clerk user
+    const {user: clerkUser, isSignedIn} = useUser()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+ 
     const dropdownRef = useRef<HTMLDivElement>(null)
+
+    const user = isSignedIn ? clerkUser : appUser
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -21,11 +30,31 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    const handleLogout = () => {
-        logout()
+const {signOut} = useClerk()
+
+    const handleLogout = async() => {
+
+
+          if (isSignedIn) {
+      await signOut();
+              setIsDropdownOpen(false)
+        navigate('/')
+    } else {
+       await  logout()
         setIsDropdownOpen(false)
         navigate('/')
+    }}
+
+
+    const displayUser = isSignedIn
+  ? {
+      fullName: clerkUser?.fullName ?? "",
+      email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? "",
     }
+  : {
+      fullName: appUser?.fullName ?? "",
+      email: appUser?.email ?? "",
+    };
 
     return (
         <section>
@@ -60,7 +89,7 @@ const Header = () => {
                                     className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
                                 >
                                     <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
-                                        {user.fullName.charAt(0).toUpperCase()}
+                                        {user?.fullName?.charAt(0).toUpperCase() ?? ''}
                                     </div>
                                     <ChevronDown
                                         size={18}
@@ -78,8 +107,8 @@ const Header = () => {
                                             className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
                                         >
                                             <div className="px-4 py-3 border-b border-neutral-100 mb-2">
-                                                <p className="text-sm font-bold text-neutral-900 truncate">{user.fullName}</p>
-                                                <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                                                <p className="text-sm font-bold text-neutral-900 truncate">{user?.fullName}</p>
+                                                <p className="text-xs text-neutral-500 truncate">  {displayUser.email} </p>
                                             </div>
 
                                             <Link

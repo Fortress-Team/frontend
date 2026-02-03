@@ -9,7 +9,7 @@ import api, {
 import type { Education, Experience, Project, Skill, UserLinks, UserProfileData } from '../../lib/api'
 import type { User } from '../../types'
 import Loader from '../reuseable/loader'
-import {  useUser } from '@clerk/clerk-react'
+import {  useClerk, useUser } from '@clerk/clerk-react'
 import { toast } from 'sonner'
 // import axios from 'axios'
 import ProfileReviewModal from './reviewModal'
@@ -18,9 +18,7 @@ const UserProfile = () => {
     const navigate = useNavigate()
 
 
-const { user: clerkUser, isSignedIn } = useUser();
-
-
+const { user: clerkUser, isSignedIn,isLoaded } = useUser();
 const { user:appUser, isAuthenticated, logout } = useAuthStore();
  const [isLoading, setIsLoading] = useState(false);
   const [reviewLoading, setReviewLoading] = useState(false);
@@ -41,11 +39,17 @@ const { user:appUser, isAuthenticated, logout } = useAuthStore();
 
 
 
-    useEffect(() => {
-        if (!isAuthenticated || !isSignedIn) {
-            navigate('/login')
-        }
-    }, [isAuthenticated,isSignedIn, navigate])
+
+useEffect(() => {
+
+  if (!isLoaded) return;
+
+  const isAuthenticatedUser = isSignedIn || isAuthenticated;
+
+  if (!isAuthenticatedUser) {
+    navigate('/login');
+  }
+}, [isLoaded, isSignedIn, isAuthenticated, navigate]);
 
 
     const user = isSignedIn ?  clerkUser : appUser;
@@ -101,10 +105,26 @@ const { user:appUser, isAuthenticated, logout } = useAuthStore();
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    const handleLogout = () => {
-        logout()
-        navigate('/')
+
+    const { signOut } = useClerk();
+
+
+const handleLogout = async () => {
+  try {
+    if (isSignedIn) {
+      await signOut();
     }
+
+    if (isAuthenticated) {
+      logout();
+    }
+
+    navigate('/login');
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
 
 
     if (loading && isAuthenticated) {
@@ -284,21 +304,22 @@ const handleOpenReviewModal = () => {
   className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
              cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
 >
-  {reviewLoading && <Loader2 className="animate-spin" size={20} />}
-<SparkleIcon size={14} /> AI
+  {reviewLoading && <Loader2 className="animate-spin hidden" size={20} />}
+<SparkleIcon size={14} /> AI 
 </button>
 
                        
-                      <button
+      {!clerkUser &&           <button
           onClick={handleShareProfile}
           disabled={isLoading}
           className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
           cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex
            items-center gap-2"
         >
-          {isLoading && <Loader2 className="animate-spin" size={20} />}
+          {isLoading  && <Loader2 className="animate-spin" size={20} />}
         <Link2Icon  size={14} /> Share
         </button>
+        }
 
 
                         </div>

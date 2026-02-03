@@ -76,7 +76,7 @@ const ProfileReviewModal: React.FC<ProfileReviewModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm py-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm py-5 px-2">
       <div className="bg-white w-full max-w-2xl rounded-xl p-6 relative shadow-lg max-h-[80vh] overflow-y-auto">
         {/* Close Button */}
         <button
