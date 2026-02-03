@@ -270,31 +270,31 @@ const handleOpenReviewModal = () => {
 
                         <div className="mb-6 flex gap-3">
                             <Link to="/profile/edit"
-                            className="px-6 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-blue-600 flex gap-2
-                             hover:bg-blue-700 text-white font-semibold rounded-xl transition-all
+                            className="px-4 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-blue-600 flex gap-2
+     items-center     hover:bg-blue-700 text-white font-semibold rounded-xl transition-all
                               shadow-lg shadow-blue-600/30  text-center">
-                           <PenBox  />     Edit 
+                           <PenBox  size={14} />     Edit 
                             </Link>
 <button
   onClick={handleOpenReviewModal}
   disabled={reviewLoading}
-  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white
+  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
              cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
 >
   {reviewLoading && <Loader2 className="animate-spin" size={20} />}
-<SparkleIcon  /> AI
+<SparkleIcon size={14} /> AI
 </button>
 
                        
                       <button
           onClick={handleShareProfile}
           disabled={isLoading}
-          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white
+          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
           cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex
            items-center gap-2"
         >
           {isLoading && <Loader2 className="animate-spin" size={20} />}
-        <Link2Icon  /> Share
+        <Link2Icon  size={14} /> Share
         </button>
 
 
