@@ -30,12 +30,12 @@ const formatTitle = (text?: string) => {
   if (!text) return "Developer";
 
   return text
-    .toLowerCase()
     .split(" ")
-    .filter(Boolean)
-    .map(word => word[0].toUpperCase() + word.slice(1))
+    .filter(Boolean) 
+    .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 };
+
 
 
   return (
@@ -52,7 +52,7 @@ const formatTitle = (text?: string) => {
         </div>
         <div>
           <h3 className="text-xl font-bold text-neutral-900 mb-1 group-hover:text-blue-600 transition-colors">
-            {talent.fullName}
+            {formatTitle(talent.fullName)}
           </h3>
           <p className="text-blue-600 text-sm font-semibold">  {formatTitle(talent.profRole)}</p>
         </div>

@@ -42,14 +42,14 @@ const { signIn, isLoaded } = useSignIn();
 if (!isLoaded) return <Loader />; 
 if (!signIn) return null
 
-const signInWithGoogle = () => {
+const signInWithGoogle = async() => {
   if (!signIn) return;
 
-  signIn.authenticateWithRedirect({
-    strategy: "oauth_google",
-    redirectUrl: "/login/sso-callback",
-    redirectUrlComplete: "/profile",
-  });
+   await signIn.authenticateWithRedirect({
+    strategy: 'oauth_google',
+    redirectUrl: '/sso-callback',
+    redirectUrlComplete: '/dashboard',
+    })
 };
 
     return (

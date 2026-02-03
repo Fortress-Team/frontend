@@ -30,7 +30,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/explore" element={<ExploreTalents />} />
         <Route path="/login" element={<Login />} />
-          <Route path="/login/sso-callback" element={<LoginCallback />} />
+          <Route path="/sso-callback" element={<LoginCallback />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/sign-up/sso-callback" element={<SignUpCallback />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />

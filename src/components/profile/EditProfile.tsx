@@ -15,6 +15,7 @@ import Loader from '../reuseable/loader'
 import EditSkills from './editSkills'
 import EditEducation from './editEducation'
 import EditExperience from './editExperience'
+import EditInfo from './editInfo'
 
 const EditProfile = () => {
     const navigate = useNavigate()
@@ -100,9 +101,7 @@ const EditProfile = () => {
         setSocialLinks({ ...socialLinks, [e.target.name]: e.target.value })
     }
 
-    const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setBasicInfo({ ...basicInfo, [e.target.name]: e.target.value })
-    }
+
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'project') => {
         const file = e.target.files?.[0]
@@ -127,8 +126,34 @@ const EditProfile = () => {
         }
     }
 
- 
-  
+
+
+  const handleAddLink = async () => {
+                                    setIsSaving(true);
+                                    try {
+                                        // APPLY SMART DEFAULTS
+                                        const githubLink = socialLinks.github || "https://github.com/username";
+                                        const linkedinLink = socialLinks.linkedin || "https://linkedin.com/in/username";
+                                        const xLink = socialLinks.X || "https://x.com/username";
+                                        const portfolioLink = socialLinks.portfolio || "https://portfolio.com";
+
+                                        await upsertUserLinks({
+                                            github: githubLink,
+                                            linkedin: linkedinLink,
+                                            X: xLink,
+                                            portfolio: portfolioLink
+                                        });
+                                        toast.success('Social links updated!');
+                                        // Refresh to show updates
+                                        // window.location.href = '/profile';
+                                    } catch (error: unknown) {
+                               const errorMessage = error instanceof Error ? error.message : "Internal server error";
+       
+                                        toast.error(errorMessage || 'Failed to update links');
+                                    } finally {
+                                        setIsSaving(false);
+                                    }
+                                }
 
     const handleAddProject = async () => {
         if (newProject.title && newProject.desc && newProject.link) {
@@ -145,13 +170,10 @@ const EditProfile = () => {
                 setNewProject({ title: '', date: '', projectImg: '', desc: '', link: '' })
                 setIsAddingProject(false)
                 toast.success("Project added!")
-            } catch (error: any) {
-                console.error("Failed to add project:", error)
-                const status = error.response?.status;
-                const message = error.response?.data?.message || error.message || "Unknown error";
-                if (status === 401) toast.error("401 Unauthorized. Relogin.");
-                else if (error.code === "ERR_NETWORK") toast.error("CORS/Network Error.");
-                else toast.error(`Error: ${message}`);
+            } catch (error: unknown) {
+ const errorMessage = error instanceof Error ? error.message : "Internal server error";                       
+                toast.error(errorMessage || 'Failed to update links');
+
             } finally {
                 setIsSubmitting({ type: null })
             }
@@ -208,7 +230,7 @@ const EditProfile = () => {
             window.location.href = '/profile'
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "Internal server error";
-            console.log(errorMessage)
+            // console.log(errorMessage)
             toast.error(errorMessage || 'Failed to save profile. Please try again.')
         } finally {
             setIsSaving(false)
@@ -244,7 +266,8 @@ const EditProfile = () => {
                                 logout()
                                 navigate('/')
                             }}
-                            className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-neutral-600
+                             hover:text-neutral-900 transition-colors cursor-pointer"
                         >
                             Logout
                         </button>
@@ -260,13 +283,18 @@ const EditProfile = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 md:gap-0">
                     <h1 className="text-3xl font-bold text-neutral-900">Edit Profile</h1>
                     <div className="flex gap-3 md:gap-4 w-full md:w-auto">
-                        <Link to="/profile" className="flex-1 md:flex-none px-6 py-2.5 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold rounded-xl transition-all border-2 border-neutral-200 text-center">
+                        <button onClick={() => navigate(-1)}
+                       className="flex-1 md:flex-none px-6 py-2.5 bg-white cursor-pointer
+                        hover:bg-neutral-50 text-neutral-900 font-semibold rounded-xl transition-all border-2 border-neutral-200 text-center">
                             Cancel
-                        </Link>
+                        </button>
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 hidden px-6 py-2.5 bg-blue-600
+                             hover:bg-blue-700 text-white font-semibold rounded-xl 
+                             transition-all shadow-lg shadow-blue-600/30 disabled:opacity-50
+                              disabled:cursor-not-allowed"
                         >
                             {isSaving ? 'Saving...' : 'Save Changes'}
                         </button>
@@ -277,142 +305,10 @@ const EditProfile = () => {
 
 
 {/* basic info */}
-                    <section className="p-8 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
-                        <h2 className="text-xl font-bold mb-6 text-neutral-900 border-b border-neutral-200 pb-4">Basic Information</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="md:col-span-2 flex items-center gap-6 mb-4">
-                                <div className="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center text-4xl border-4 border-white shadow-lg relative group overflow-hidden">
-                                    {basicInfo.avatar ? (
-                                        <img src={basicInfo.avatar} alt="Preview" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span className="text-blue-600 font-bold">{user?.fullName.charAt(0).toUpperCase()}</span>
-                                    )}
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-[10px] font-medium text-white uppercase tracking-wider">Preview</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 className="font-medium text-neutral-900">Profile Photo</h3>
-                                    <p className="text-sm text-neutral-500 mb-4">Recommended: 400x400px (Optional)</p>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="relative group w-fit">
-                                            <input
-                                                type="text"
-                                                name="avatar"
-                                                placeholder="Image URL"
-                                                value={basicInfo.avatar}
-                                                onChange={handleBasicInfoChange}
-                                                className="w-full px-4 py-2 rounded-lg bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                                            />
-                                            <div className="mt-2">
-                                                <label className="flex items-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg cursor-pointer transition-colors text-sm font-medium w-fit">
-                                                    {isUploading.type === 'avatar' ? (
-                                                        <Loader2 size={16} className="animate-spin" />
-                                                    ) : (
-                                                        <Upload size={16} />
-                                                    )}
-                                                    {isUploading.type === 'avatar' ? 'Uploading...' : 'Upload Image'}
-                                                    <input
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept="image/*"
-                                                        onChange={(e) => handleFileUpload(e, 'avatar')}
-                                                        disabled={isUploading.type !== null}
-                                                    />
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">Full Name</label>
-                                <input
-                                    id='name'
-                                    type="text"
-                                    name="fullName"
-                                    value={basicInfo.fullName}
-                                    onChange={handleBasicInfoChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="role" className="block text-sm font-medium text-neutral-700 mb-2">Professional Role</label>
-                                <input
-                                    id="role"
-                                    type="text"
-                                    name="profRole"
-                                    value={basicInfo.profRole}
-                                    onChange={handleBasicInfoChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label
-                                    htmlFor="location" className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
-                                <input
-                                    id='location'
-                                    type="text"
-                                    name="location"
-                                    value={basicInfo.location}
-                                    onChange={handleBasicInfoChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label htmlFor="bio"
-                                    className="block text-sm font-medium text-neutral-700 mb-2">Bio</label>
-                                <textarea
-                                    id='bio'
-                                    name="bio"
-                                    value={basicInfo.bio}
-                                    onChange={handleBasicInfoChange}
-                                    rows={4}
-                                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end mt-8 border-t border-neutral-100 pt-6">
-                            <button
-                                onClick={async () => {
-                                    const userId = (user as any)?.id || user?._id || (user as User)?._id;
-                                    if (!userId) { toast.error("Please login"); return; }
-                                    setIsSaving(true);
-                                    try {
-                                        // APPLY SMART DEFAULTS
-                                        const bio = basicInfo.bio || "Tell us about yourself!";
-                                        const location = basicInfo.location || "Global";
-                                        const profRole = basicInfo.profRole || "Talent";
-                                        const avatar = basicInfo.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(basicInfo.fullName || user?.fullName || "User")}&background=dbeafe&color=2563eb&size=512`;
-
-                                        await updateUserProfile(userId, {
-                                            ...basicInfo,
-                                            bio,
-                                            location,
-                                            profRole,
-                                            avatar
-                                        });
-                                        toast.success('Basic information updated!');
-                                        window.location.href = '/profile';
-                                    } catch (error: any) {
-                                        toast.error(error.message || 'Failed to update info');
-                                    } finally {
-                                        setIsSaving(false);
-                                    }
-                                }}
-                                disabled={isSaving}
-                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
-                            >
-                                {isSaving ? <Loader2 className="animate-spin" size={20} /> : null}
-                                Save Basic Info
-                            </button>
-                        </div>
-                    </section>
+                 
+    <div>
+            <EditInfo  />
+          </div>
 
 
 {/* links */}
@@ -467,30 +363,7 @@ const EditProfile = () => {
 
                         <div className="flex justify-end mt-8 border-t border-neutral-100 pt-6">
                             <button
-                                onClick={async () => {
-                                    setIsSaving(true);
-                                    try {
-                                        // APPLY SMART DEFAULTS
-                                        const githubLink = socialLinks.github || "https://github.com/username";
-                                        const linkedinLink = socialLinks.linkedin || "https://linkedin.com/in/username";
-                                        const xLink = socialLinks.X || "https://x.com/username";
-                                        const portfolioLink = socialLinks.portfolio || "https://portfolio.com";
-
-                                        await upsertUserLinks({
-                                            github: githubLink,
-                                            linkedin: linkedinLink,
-                                            X: xLink,
-                                            portfolio: portfolioLink
-                                        });
-                                        toast.success('Social links updated!');
-                                        // Refresh to show updates
-                                        window.location.href = '/profile';
-                                    } catch (error: any) {
-                                        toast.error(error.message || 'Failed to update links');
-                                    } finally {
-                                        setIsSaving(false);
-                                    }
-                                }}
+                                onClick=  {handleAddLink}
                                 disabled={isSaving}
                                 className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
                             >

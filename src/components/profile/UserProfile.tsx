@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useEffect, useState, useRef } from 'react'
-import { ChevronDown, LogOut, Compass, GraduationCap, Github, Linkedin, Twitter, Globe } from 'lucide-react'
+import { ChevronDown, LogOut, Compass, GraduationCap, Github, Linkedin, Twitter, Globe, Loader2, SparkleIcon, Link2Icon, PenBox } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     getEducations, getExperiences, getProjects, getSkills, getUserLinks, getUserProfile
@@ -10,16 +10,21 @@ import type { Education, Experience, Project, Skill, UserLinks, UserProfileData 
 import type { User } from '../../types'
 import Loader from '../reuseable/loader'
 import { useUser } from '@clerk/clerk-react'
+import { toast } from 'sonner'
+import axios from 'axios'
+import ProfileReviewModal from './reviewModal'
 
 const UserProfile = () => {
     const navigate = useNavigate()
 
 
-const { user: clerkUser } = useUser();
+const { user: clerkUser, isSignedIn } = useUser();
 
 
-const { user, isAuthenticated, logout } = useAuthStore();
-
+const { user:appUser, isAuthenticated, logout } = useAuthStore();
+ const [isLoading, setIsLoading] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -40,12 +45,12 @@ const { user, isAuthenticated, logout } = useAuthStore();
     }, [isAuthenticated, navigate])
 
 
-    const currentUser = clerkUser || user;
+    const user = isSignedIn ?  clerkUser : appUser;
 
     // console.log("Clerk user:", clerkUser?.firstName);
 // console.log("Store user:", user?.email);
 //    console.log("Current user:", clerkUser?.firstName);
-   console.log('Current user:', currentUser)
+   console.log('Current user:', user)
 
 
     
@@ -55,7 +60,7 @@ const { user, isAuthenticated, logout } = useAuthStore();
         const fetchData = async () => {
             if (!isAuthenticated) return
             try {
-                const [expData, eduData, projData, skillData, linksData] = await Promise.all([
+        const [expData, eduData, projData, skillData, linksData] = await Promise.all([
                     getExperiences(),
                     getEducations(),
                     getProjects(),
@@ -68,7 +73,8 @@ const { user, isAuthenticated, logout } = useAuthStore();
                 setSkills(skillData)
                 setLinks(linksData)
 
-                const userId = (user as User)?._id || user?._id || (user as User)?._id
+        const userId = user && ("_id" in user ? user._id  : "id" in user ? user.id  : null);
+
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setProfile(profileData)
@@ -118,7 +124,46 @@ const { user, isAuthenticated, logout } = useAuthStore();
         return null
     }
 
+
+const handleShareProfile = async () => {
+  const userId = ("_id" in user ? user._id : user?.id) || "";
+  if (!userId) return;
+
+  setIsLoading(true); // or setIsSharing(true)
+  try {
+    const res = await axios.get<{ message: string; link: string }>(`/api/users/share/${userId}`);
+    const link = res.data.link;
+
+    if (!link) throw new Error("No link returned from server");
+
+    await navigator.clipboard.writeText(link);
+    toast.success("Link copied successfully!");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    toast.error(errorMessage || "Failed to copy link");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+
+  const userId = ("_id" in user ? user._id : user?.id) || "";
+const handleOpenReviewModal = () => {
+  setReviewLoading(true); // show loading first
+
+  // small delay to simulate processing before opening modal
+  setTimeout(() => {
+    setReviewLoading(false);      // hide spinner
+    setIsReviewModalOpen(true);   // open modal
+  }, 300); // 300ms is usually enough for a small “flash”
+};
+
+
+// handleReviewProfile
+
     return (
+
         <div className="min-h-screen bg-white text-neutral-900 font-sans pb-20">
             <nav className="fixed w-full z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -133,55 +178,57 @@ const { user, isAuthenticated, logout } = useAuthStore();
                         </Link>
 
                         {/* Profile Dropdown */}
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
-                            >
-                                <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
-                                    {user.fullName.charAt(0).toUpperCase()}
-                                </div>
-                                <ChevronDown
-                                    size={18}
-                                    className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
-                                />
-                            </button>
+                <div className="relative" ref={dropdownRef}>
+  <button
+    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+    className="flex items-center gap-2 p-1.5 hover:bg-neutral-50 rounded-xl transition-colors group"
+  >
+    <div className="h-9 w-9 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white shadow-sm">
+      {(user?.fullName?.charAt(0).toUpperCase() || "U")}
+    </div>
+    <ChevronDown
+      size={18}
+      className={`text-neutral-400 group-hover:text-neutral-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+    />
+  </button>
 
-                            <AnimatePresence>
-                                {isDropdownOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        transition={{ duration: 0.15, ease: "easeOut" }}
-                                        className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
-                                    >
-                                        <div className="px-4 py-3 border-b border-neutral-100 mb-2">
-                                            <p className="text-sm font-bold text-neutral-900 truncate">{user.fullName}</p>
-                                            <p className="text-xs text-neutral-500 truncate">{user.email}</p>
-                                        </div>
+  <AnimatePresence>
+    {isDropdownOpen && (
+      <motion.div
+        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+        className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl py-2 z-50"
+      >
+        <div className="px-4 py-3 border-b border-neutral-100 mb-2">
+          <p className="text-sm font-bold text-neutral-900 truncate">{user?.fullName || "User"}</p>
+          <p className="text-xs text-neutral-500 truncate">
+            {"email" in user ? user.email : clerkUser?.primaryEmailAddress?.emailAddress || ""}
+          </p>
+        </div>
 
+        <Link
+          to="/explore"
+          onClick={() => setIsDropdownOpen(false)}
+          className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors md:hidden"
+        >
+          <Compass size={18} />
+          Explore
+        </Link>
 
-                                        <Link
-                                            to="/explore"
-                                            onClick={() => setIsDropdownOpen(false)}
-                                            className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-blue-600 transition-colors md:hidden"
-                                        >
-                                            <Compass size={18} />
-                                            Explore
-                                        </Link>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
+        >
+          <LogOut size={18} />
+          Logout
+        </button>
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
 
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-neutral-100 pt-3"
-                                        >
-                                            <LogOut size={18} />
-                                            Logout
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
 
                     </div>
                 </div>
@@ -200,7 +247,7 @@ const { user, isAuthenticated, logout } = useAuthStore();
                                 {profile?.avatar ? (
                                     <img src={profile.avatar} alt={profile.fullName} className="w-full h-full object-cover" />
                                 ) : (
-                                    <span className="text-blue-600 font-bold">{user.fullName.charAt(0).toUpperCase()}</span>
+                                    <span className="text-blue-600 font-bold">{user?.fullName?.charAt(0).toUpperCase() || "U"}</span>
                                 )}
                             </div>
                         </div>
@@ -208,7 +255,7 @@ const { user, isAuthenticated, logout } = useAuthStore();
                             <h1 className="text-4xl font-bold text-neutral-900 mb-1">{profile?.fullName || user.fullName}</h1>
                             {profile?.profRole && <p className="text-neutral-700 font-medium text-lg">{profile.profRole}</p>}
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1">
-                                <p className="text-neutral-500 text-sm">{profile?.email || user.email}</p>
+                                <p className="text-neutral-500 text-sm">{profile?.email || ("email" in user ? user.email : clerkUser?.primaryEmailAddress?.emailAddress) || ''}</p>
                                 {profile?.location && (
                                     <>
                                         <span className="text-neutral-300 hidden md:block">•</span>
@@ -219,23 +266,64 @@ const { user, isAuthenticated, logout } = useAuthStore();
                                 <p className="text-neutral-500 text-sm">Joined Dec 2025</p>
                             </div>
                         </div>
+
+
                         <div className="mb-6 flex gap-3">
-                            <Link to="/profile/edit" className="px-5 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 block text-center">
-                                Edit Profile
+                            <Link to="/profile/edit"
+                            className="px-6 py-2 md:px-6 md:py-2.5 text-sm md:text-base bg-blue-600 flex gap-2
+                             hover:bg-blue-700 text-white font-semibold rounded-xl transition-all
+                              shadow-lg shadow-blue-600/30  text-center">
+                           <PenBox  />     Edit 
                             </Link>
+<button
+  onClick={handleOpenReviewModal}
+  disabled={reviewLoading}
+  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white
+             cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
+>
+  {reviewLoading && <Loader2 className="animate-spin" size={20} />}
+<SparkleIcon  /> AI
+</button>
+
+                       
+                      <button
+          onClick={handleShareProfile}
+          disabled={isLoading}
+          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white
+          cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex
+           items-center gap-2"
+        >
+          {isLoading && <Loader2 className="animate-spin" size={20} />}
+        <Link2Icon  /> Share
+        </button>
+
+
                         </div>
+
+
                     </div>
                 </div>
             </div>
 
+
+  {/* Modal */}
+      <ProfileReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        userId={userId}
+      />
+
+{/* Profile Info */}
             <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 <div className="lg:col-span-1 space-y-8">
 
+
+{/* about */}
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">About</h3>
                         <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
-                            {profile?.bio || (isAuthenticated && ((user as User)?._id === profile?.id || user?._id === profile?.id || (user as User)?._id === (profile as any)?.id) ? "No bio added yet. Tell us about yourself!" : "")}
+                            {profile?.bio || (isAuthenticated && (("_id" in user ? (user as User)?._id : user?.id) === profile?.id) ? "No bio added yet. Tell us about yourself!" : "")}
                         </p>
 
                         <div className="mt-6 flex flex-wrap gap-4 text-neutral-400">
@@ -375,6 +463,7 @@ const { user, isAuthenticated, logout } = useAuthStore();
                     </div>
                 </div>
             </div>
+
         </div>
     )
 }

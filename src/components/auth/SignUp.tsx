@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
 import { Eye, EyeOff } from 'lucide-react'
-import { useSignUp } from '@clerk/clerk-react'
+import { useSignIn } from '@clerk/clerk-react'
 
 
 const SignUp = () => {
@@ -34,8 +34,9 @@ const SignUp = () => {
         try {
             await register(formData.fullName, formData.email, formData.password)
             navigate('/verify-otp')
-        } catch (error: any) {
-            setError(error.message || "Registration failed. Please try again.")
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Registration failed. Please try again."
+            setError(errorMessage)
         } finally {
             setLoading(false)
         }
@@ -46,15 +47,16 @@ const SignUp = () => {
     // }
 
 
-      const { signUp } = useSignUp();
+      const { isLoaded, signIn } = useSignIn();
 
-  const signUpWithGoogle = () => {
-    if (!signUp) return; 
-    signUp.authenticateWithRedirect({
-      strategy: "oauth_google",
-      redirectUrl: "/sign-up/sso-callback",
-      redirectUrlComplete: "/profile",
-    });
+  const signUpWithGoogle = async() => {
+ if (!isLoaded || !signIn) return 
+
+    await signIn.authenticateWithRedirect({
+    strategy: 'oauth_google',
+    redirectUrl: '/sso-callback',
+    redirectUrlComplete: '/dashboard',
+    })
   };
 
   
