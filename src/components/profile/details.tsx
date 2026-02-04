@@ -32,7 +32,7 @@ const UserProfileDetails = () => {
     );
   }
 
-  console.log('Talent details:', talent)
+  // console.log('Talent details:', talent)
 
 
 
@@ -281,7 +281,7 @@ type NavsProps = {
 
 const Navs = ({ talent }: NavsProps) => {
   const navigate = useNavigate();
-  const { user: appUser , logout } = useAuthStore();
+  const { user: appUser , logout , isAuthenticated} = useAuthStore();
   const {isSignedIn, user:clerkUser} = useUser()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -303,22 +303,41 @@ const Navs = ({ talent }: NavsProps) => {
   }, []);
 
 
-    const user = isSignedIn ? clerkUser : appUser
+
+
+
+
+ const isClerkAuthed = isSignedIn && clerkUser != null;
+const isAppAuthed = isAuthenticated && appUser != null;
+
+const user = isClerkAuthed
+  ? clerkUser
+  : isAppAuthed
+  ? appUser
+  : null;
+
+  console.log('In explore:', user)
+
+
 
   const {signOut} = useClerk()
 
-    const handleLogout = async() => {
+const handleLogout = async () => {
+  try {
+    if (isSignedIn) {
+      await signOut(); // Clerk
+    }
 
+    if (isAuthenticated) {
+      logout(); // App store
+    }
 
-          if (isSignedIn) {
-      await signOut();
-              setIsDropdownOpen(false)
-        navigate('/')
-    } else {
-       await  logout()
-        setIsDropdownOpen(false)
-        navigate('/')
-    }}
+    navigate('/login');
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
 
         const displayUser = isSignedIn
   ? {

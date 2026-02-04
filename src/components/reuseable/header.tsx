@@ -18,7 +18,18 @@ const Header = () => {
  
     const dropdownRef = useRef<HTMLDivElement>(null)
 
-    const user = isSignedIn ? clerkUser : appUser
+
+ const isClerkAuthed = isSignedIn && clerkUser != null;
+const isAppAuthed = isAuthenticated && appUser != null;
+
+const user = isClerkAuthed
+  ? clerkUser
+  : isAppAuthed
+  ? appUser
+  : null;
+
+
+  console.log('user in home:', user)
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -32,18 +43,21 @@ const Header = () => {
 
 const {signOut} = useClerk()
 
-    const handleLogout = async() => {
+   const handleLogout = async () => {
+  try {
+    if (isSignedIn) {
+      await signOut(); // Clerk
+    }
 
+    if (isAuthenticated) {
+      logout(); // App store
+    }
 
-          if (isSignedIn) {
-      await signOut();
-              setIsDropdownOpen(false)
-        navigate('/')
-    } else {
-       await  logout()
-        setIsDropdownOpen(false)
-        navigate('/')
-    }}
+    navigate('/login');
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
 
 
     const displayUser = isSignedIn

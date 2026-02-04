@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
 import { Eye, EyeOff } from 'lucide-react'
-import { useSignIn, useUser } from '@clerk/clerk-react'
+import { useAuth, useSignIn } from '@clerk/clerk-react'
 // import Loader from '../reuseable/loader'
 
 
@@ -37,21 +37,42 @@ const Login = () => {
 
 
 
-const { signIn, isLoaded } = useSignIn();
-const {isSignedIn} = useUser()
+// const { signIn, isLoaded } = useSignIn();
+// const {isSignedIn} = useUser()
 
 // if (!isLoaded) return <Loader />; 
 // if (!signIn) return null
 
-const signInWithGoogle = async() => {
-    console.log('Cliced')
-  if (!isSignedIn || !isLoaded) return;
+// const signInWithGoogle = async() => {
+//     console.log('Cliced')
+//   if (!isSignedIn || !isLoaded) return;
 
-   await signIn.authenticateWithRedirect({
-    strategy: 'oauth_google',
-    redirectUrl: '/sso-callback',
-    redirectUrlComplete: '/profile',
-    })
+//    await signIn.authenticateWithRedirect({
+//     strategy: 'oauth_google',
+//     redirectUrl: '/sso-callback',
+//     redirectUrlComplete: '/profile',
+//     })
+// };
+
+
+const { signIn, isLoaded } = useSignIn();
+const {isSignedIn} = useAuth()
+
+const signInWithGoogle = async () => {
+  console.log("Clicked");
+
+  if (!isLoaded || !signIn) return;
+
+   if (isSignedIn) {
+      navigate("/profile");
+      return;
+    }
+
+  await signIn.authenticateWithRedirect({
+    strategy: "oauth_google",
+    redirectUrl: "/sso-callback",
+    redirectUrlComplete: "/profile",
+  });
 };
 
     return (

@@ -10,22 +10,51 @@ import type {  Project,  UserLinks } from '../../lib/api'
 import { Trash2,  Upload, Loader2, Link as LinkIcon } from 'lucide-react'
 import { uploadImage } from '../../lib/cloudinary'
 import { toast } from 'sonner'
-import type { User } from '../../types'
 import Loader from '../reuseable/loader'
 import EditSkills from './editSkills'
 import EditEducation from './editEducation'
 import EditExperience from './editExperience'
 import EditInfo from './editInfo'
+import { useUser } from '@clerk/clerk-react'
 
 const EditProfile = () => {
     const navigate = useNavigate()
-    const { user, isAuthenticated, logout } = useAuthStore()
+    const { user: appUser, isAuthenticated, logout } = useAuthStore()
+    const { user: clerkUser, isSignedIn,isLoaded } = useUser();
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/login')
-        }
-    }, [isAuthenticated, navigate])
+       const user = isSignedIn ?  clerkUser : appUser;
+
+    //    const isAuthed = isSignedIn || isAuthenticated;
+/* ---------------- USER ID ---------------- */
+
+// const userId = isSignedIn
+//   ? clerkUser?.id         
+//   : appUser?._id;         
+
+
+               const displayUser = isSignedIn
+  ? {
+      fullName: clerkUser?.fullName ?? "",
+      email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? "",
+    }
+  : {
+      fullName: appUser?.fullName ?? "",
+      email: appUser?.email ?? "",
+    };
+
+
+
+
+useEffect(() => {
+
+  if (!isLoaded) return;
+
+  const isAuthenticatedUser = isSignedIn || isAuthenticated;
+
+  if (!isAuthenticatedUser) {
+    navigate('/login');
+  }
+}, [isLoaded, isSignedIn, isAuthenticated, navigate]);
 
     const [basicInfo, setBasicInfo] = useState({
         fullName: user?.fullName || '',
@@ -76,8 +105,11 @@ const EditProfile = () => {
                 ])
                 setProjects(projData)
                 setSocialLinks(linksData)
+         
+             const userId = isSignedIn
+  ? clerkUser?.id         
+  : appUser?._id;
 
-                const userId = (user as User)?._id || user?._id || (user as User)?._id
                 if (userId) {
                     const profileData = await getUserProfile(userId)
                     setBasicInfo({
@@ -193,7 +225,12 @@ const EditProfile = () => {
     const [isSaving, setIsSaving] = useState(false)
 
     const handleSave = async () => {
-        const userId = (user as User)?._id || user?._id || (user as User)?._id
+        // const userId = (user as User)?._id || user ? user.d : user._id || (user as User)?._id
+                 
+        const userId = isSignedIn
+  ? clerkUser?.id         
+  : appUser?._id;
+
         if (!userId) {
             toast.error("User ID not found. Please log in again.")
             return
@@ -272,7 +309,7 @@ const EditProfile = () => {
                             Logout
                         </button>
                         <div className="h-10 w-10 rounded-full bg-blue-600 border-2 border-blue-100 flex items-center justify-center text-sm font-bold text-white">
-                            {user?.fullName.charAt(0).toUpperCase()}
+                            {displayUser?.fullName.charAt(0).toUpperCase()}
                         </div>
                     </div>
                 </div>

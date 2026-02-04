@@ -38,21 +38,48 @@ const { user:appUser, isAuthenticated, logout } = useAuthStore();
 
 
 
-
-
 useEffect(() => {
+  if (!isLoaded) return; 
 
-  if (!isLoaded) return;
+  const isAuthUser = isAuthenticated && appUser != null;
+  const isClerkUser = isSignedIn && clerkUser != null;
 
-  const isAuthenticatedUser = isSignedIn || isAuthenticated;
-
-  if (!isAuthenticatedUser) {
+  if (!isAuthUser && !isClerkUser) {
     navigate('/login');
   }
-}, [isLoaded, isSignedIn, isAuthenticated, navigate]);
+}, [isLoaded, isAuthenticated, appUser, isSignedIn, clerkUser, navigate]);
 
 
-    const user = isSignedIn ?  clerkUser : appUser;
+//  const isClerkAuthed = isSignedIn && clerkUser != null;
+// const isAppAuthed = isAuthenticated && appUser != null;
+
+const user = isAuthenticated && appUser != null
+  ? appUser  // always use your app form user first
+  : isSignedIn && clerkUser != null
+  ? clerkUser
+  : null;
+
+
+    const { signOut } = useClerk();
+
+
+const handleLogout = async () => {
+  try {
+    if (isSignedIn) {
+      await signOut(); // Clerk
+    }
+
+    if (isAuthenticated) {
+      logout(); // App store
+    }
+
+    navigate('/login');
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
+
 
     // console.log("Clerk user:", clerkUser?.firstName);
 // console.log("Store user:", user?.email);
@@ -95,6 +122,8 @@ useEffect(() => {
         fetchData()
     }, [isAuthenticated, user])
 
+      
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -106,24 +135,6 @@ useEffect(() => {
     }, [])
 
 
-    const { signOut } = useClerk();
-
-
-const handleLogout = async () => {
-  try {
-    if (isSignedIn) {
-      await signOut();
-    }
-
-    if (isAuthenticated) {
-      logout();
-    }
-
-    navigate('/login');
-  } catch (error) {
-    console.error("Logout failed:", error);
-  }
-};
 
 
 
