@@ -359,7 +359,7 @@ const handleOpenReviewModal = () => {
 </button>
 
                        
-      {!clerkUser &&           <button
+              <button
           onClick={handleShareProfile}
           disabled={isLoading}
           className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
@@ -369,7 +369,7 @@ const handleOpenReviewModal = () => {
           {isLoading  && <Loader2 className="animate-spin" size={20} />}
         <Link2Icon  size={14} /> Share
         </button>
-        }
+        
 
 
                         </div>
