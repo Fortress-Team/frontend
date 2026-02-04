@@ -17,15 +17,25 @@ interface AuthState {
     register : (fullName : string , email : string , password : string) =>Promise<void>;
     logout : () => void;
     verifyOTP : (otp : string) => Promise<void>;
+      setUser: (user: User | null) => void;
+  getUser: () => User | null;
 }
 
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
 
-export const  useAuthStore = create<AuthState>()(
-    persist(
-        (set) => ({
-            user : null,
-            token : null,
-            isAuthenticated : false,
+      setUser: (user) => {
+        set({ user, isAuthenticated: !!user });
+      },
+
+      getUser: () => {
+        return get().user;
+      },
+
             login : async (email : string , password : string) => {
                 try {
                     const response = await LoginUser({email , password});

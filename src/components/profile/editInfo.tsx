@@ -1,5 +1,5 @@
 // import React from 'react'
-import { useUser } from "@clerk/clerk-react";
+// import { useUser } from "@clerk/clerk-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuthStore } from "../../store/authStore";
@@ -10,18 +10,17 @@ import { updateUserProfile } from "../../lib";
 
 const EditInfo = () => {
   const { user: appUser } = useAuthStore();
-  const { user: clerkUser, isSignedIn } = useUser();
+  // const { user: clerkUser, isSignedIn } = useUser();
 
   const [isSaving, setIsSaving] = useState(false);
 
   // Unified user object
-  const user = isSignedIn ? clerkUser : appUser;
+  // const user = isSignedIn ? clerkUser : appUser;
+  const user = appUser;
 
   const userId = user
     ? "_id" in user
       ? user._id
-      : "id" in user
-      ? user.id
       : null
     : null;
 

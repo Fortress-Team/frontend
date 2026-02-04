@@ -53,11 +53,14 @@ useEffect(() => {
 //  const isClerkAuthed = isSignedIn && clerkUser != null;
 // const isAppAuthed = isAuthenticated && appUser != null;
 
-const user = isAuthenticated && appUser != null
-  ? appUser  // always use your app form user first
-  : isSignedIn && clerkUser != null
-  ? clerkUser
-  : null;
+// const user = isAuthenticated && appUser != null
+//   ? appUser  // always use your app form user first
+//   : isSignedIn && clerkUser != null
+//   ? clerkUser
+//   : null;
+
+// Only use DB user
+const user = appUser;
 
 
     const { signOut } = useClerk();
@@ -86,11 +89,7 @@ const handleLogout = async () => {
 //    console.log("Current user:", clerkUser?.firstName);
 //    console.log('Current user:', user)
 
-
-    
-
-
-    useEffect(() => {
+        useEffect(() => {
         const fetchData = async () => {
             if (!isAuthenticated) return
             try {
@@ -107,7 +106,7 @@ const handleLogout = async () => {
                 setSkills(skillData)
                 setLinks(linksData)
 
-        const userId = user && ("_id" in user ? user._id  : "id" in user ? user.id  : null);
+        const userId = user && ("_id" in user ? user._id  : null);
 
                 if (userId) {
                     const profileData = await getUserProfile(userId)
@@ -122,6 +121,19 @@ const handleLogout = async () => {
         fetchData()
     }, [isAuthenticated, user])
 
+    
+
+
+    const formatTitle = (text?: string) => {
+  if (!text) return "Developer";
+
+  return text
+    .split(" ")
+    .filter(Boolean) 
+    .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
+
       
 
     useEffect(() => {
@@ -133,6 +145,31 @@ const handleLogout = async () => {
         document.addEventListener('mousedown', handleClickOutside)
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
+
+
+    // save clerk  user 
+useEffect(() => {
+  if (!isSignedIn || !clerkUser) return;
+
+  const syncUser = async () => {
+    try {
+      const payload = {
+        fullName: `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim(),
+        email: clerkUser.emailAddresses[0]?.emailAddress,
+      };
+
+      const res = await api.post("/users/clerk-sync", payload);
+
+     
+      useAuthStore.getState().setUser(res.data.user);
+    } catch (err) {
+      console.error("Failed to sync Clerk user:", err);
+    }
+  };
+
+  syncUser();
+}, [isSignedIn, clerkUser]);
+
 
 
 
@@ -159,8 +196,10 @@ const handleLogout = async () => {
     }
 
 
+
+
 const handleShareProfile = async () => {
-  const userId = ("_id" in user ? user._id : user?.id) || "";
+  const userId = ("_id" in user ? user._id : null) || "";
   if (!userId) return;
 
   setIsLoading(true); 
@@ -182,7 +221,7 @@ const handleShareProfile = async () => {
 
 
 
-  const userId = ("_id" in user ? user._id : user?.id) || "";
+  const userId = ("_id" in user ? user._id : null) || "";
 const handleOpenReviewModal = () => {
   setReviewLoading(true); 
 
@@ -286,7 +325,7 @@ const handleOpenReviewModal = () => {
                             </div>
                         </div>
                         <div className="mb-4 md:mb-1 flex-1 text-center md:text-left">
-                            <h1 className="text-4xl font-bold text-neutral-900 mb-1">{profile?.fullName || user.fullName}</h1>
+                            <h1 className="text-4xl font-bold text-neutral-900 mb-1">{formatTitle(profile?.fullName || user.fullName)}</h1>
                             {profile?.profRole && <p className="hidden text-neutral-700 font-medium text-lg">{profile.profRole}</p>}
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1">
                                 <p className="text-neutral-500 text-sm">{profile?.email || ("email" in user ? user.email : clerkUser?.primaryEmailAddress?.emailAddress) || ''}</p>
@@ -358,7 +397,7 @@ const handleOpenReviewModal = () => {
                     <div className="p-6 rounded-2xl bg-white border-2 border-neutral-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-4 text-neutral-900">About</h3>
                         <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
-                            {profile?.bio || (isAuthenticated && (("_id" in user ? (user as User)?._id : user?.id) === profile?.id) ? "No bio added yet. Tell us about yourself!" : "")}
+                            {profile?.bio || (isAuthenticated && (("_id" in user ? (user as User)?._id : null) === profile?.id) ? "No bio added yet. Tell us about yourself!" : "")}
                         </p>
 
                         <div className="mt-6 flex flex-wrap gap-4 text-neutral-400">

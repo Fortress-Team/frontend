@@ -86,12 +86,13 @@ export const useTalentStore = create<UserState>((set) => ({
     if (!response.ok) {
       throw new Error(data?.message || "Failed to fetch users");
     }
+set({
+  loading: false,
+  talents: Array.isArray(data?.users) ? data.users : [], // always replace
+  totalPage: data?.totalPages ?? 1,
+});
 
-    set({
-      loading: false,
-      talents: Array.isArray(data?.users) ? data.users : [],
-      totalPage: data?.totalPage ?? 1,
-    });
+
 
     return { success: true, users: data.users };
   } catch (error: unknown) {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { FcGoogle } from 'react-icons/fc'
 import { Eye, EyeOff } from 'lucide-react'
-import { useSignIn } from '@clerk/clerk-react'
+import { useAuth, useSignIn } from '@clerk/clerk-react'
 
 
 const SignUp = () => {
@@ -47,18 +47,25 @@ const SignUp = () => {
     // }
 
 
-      const { isLoaded, signIn } = useSignIn();
+const { signIn, isLoaded } = useSignIn();
+const {isSignedIn} = useAuth()
 
-  const signUpWithGoogle = async() => {
- if (!isLoaded || !signIn) return 
+const signUpWithGoogle = async () => {
+  console.log("Clicked");
 
-    await signIn.authenticateWithRedirect({
-    strategy: 'oauth_google',
-    redirectUrl: '/sso-callback',
-    redirectUrlComplete: '/dashboard',
-    })
-  };
+  if (!isLoaded || !signIn) return;
 
+   if (isSignedIn) {
+      navigate("/profile");
+      return;
+    }
+
+  await signIn.authenticateWithRedirect({
+    strategy: "oauth_google",
+    redirectUrl: "/sso-callback",
+    redirectUrlComplete: "/profile",
+  });
+};
   
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">

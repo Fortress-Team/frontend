@@ -43,7 +43,7 @@ const getInitials = (name: string) =>
 
 
 
-    // console.log('All talents:', talents)
+    console.log('All talents:', talents)
 
     const filteredTalents = useMemo(() => {
         return talents.filter(talent => {
