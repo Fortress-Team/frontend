@@ -199,12 +199,16 @@ useEffect(() => {
 
 
 const handleShareProfile = async () => {
+  console.log("Clicked!"); // Step 1
   const userId = ("_id" in user ? user._id : null) || "";
+  console.log("userId", userId); // Step 2
   if (!userId) return;
 
-  setIsLoading(true); 
+  setIsLoading(true);
   try {
+    console.log("Calling API...");
     const res = await api.get<{ message: string; link: string }>(`/users/share/${userId}`);
+    console.log("API response:", res.data);
     const link = res.data.link;
 
     if (!link) throw new Error("No link returned from server");
@@ -212,13 +216,13 @@ const handleShareProfile = async () => {
     await navigator.clipboard.writeText(link);
     toast.success("Link copied successfully!");
   } catch (error: unknown) {
+    console.error(error);
     const errorMessage = error instanceof Error ? error.message : "Internal server error";
     toast.error(errorMessage || "Failed to copy link");
   } finally {
     setIsLoading(false);
   }
 };
-
 
 
   const userId = ("_id" in user ? user._id : null) || "";
@@ -351,7 +355,7 @@ const handleOpenReviewModal = () => {
 <button
   onClick={handleOpenReviewModal}
   disabled={reviewLoading}
-  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
+  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm hidden
              cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
 >
   {reviewLoading && <Loader2 className="animate-spin hidden" size={20} />}
@@ -362,8 +366,8 @@ const handleOpenReviewModal = () => {
               <button
           onClick={handleShareProfile}
           disabled={isLoading}
-          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm
-          cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 flex
+          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm hidden
+          cursor-pointer font-bold rounded-xl transition-all shadow-lg shadow-blue-600/30 
            items-center gap-2"
         >
           {isLoading  && <Loader2 className="animate-spin" size={20} />}
