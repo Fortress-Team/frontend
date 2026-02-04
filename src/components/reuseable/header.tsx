@@ -19,17 +19,21 @@ const Header = () => {
     const dropdownRef = useRef<HTMLDivElement>(null)
 
 
- const isClerkAuthed = isSignedIn && clerkUser != null;
-const isAppAuthed = isAuthenticated && appUser != null;
+//  const isClerkAuthed = isSignedIn && clerkUser != null;
+// const isAppAuthed = isAuthenticated && appUser != null;
 
-const user = isClerkAuthed
-  ? clerkUser
-  : isAppAuthed
-  ? appUser
-  : null;
+// const user = isClerkAuthed
+//   ? clerkUser
+//   : isAppAuthed
+//   ? appUser
+//   : null;
 
 
-  console.log('user in home:', user)
+//   console.log('user in home:', user)
+
+
+// Only use DB user
+const user = appUser;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

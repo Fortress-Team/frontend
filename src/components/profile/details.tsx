@@ -307,16 +307,20 @@ const Navs = ({ talent }: NavsProps) => {
 
 
 
- const isClerkAuthed = isSignedIn && clerkUser != null;
-const isAppAuthed = isAuthenticated && appUser != null;
+//  const isClerkAuthed = isSignedIn && clerkUser != null;
+// const isAppAuthed = isAuthenticated && appUser != null;
 
-const user = isClerkAuthed
-  ? clerkUser
-  : isAppAuthed
-  ? appUser
-  : null;
+// const user = isClerkAuthed
+//   ? clerkUser
+//   : isAppAuthed
+//   ? appUser
+//   : null;
 
-  console.log('In explore:', user)
+
+// Only use DB user
+const user = appUser;
+
+  // console.log('In explore:', user)
 
 
 
